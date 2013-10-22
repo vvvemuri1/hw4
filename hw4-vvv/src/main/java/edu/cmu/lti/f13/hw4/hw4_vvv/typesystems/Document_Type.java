@@ -11,12 +11,11 @@ import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
-import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Fri Oct 11 01:58:03 EDT 2013
+ * Updated by JCasGen Tue Oct 22 12:08:50 EDT 2013
  * @generated */
-public class Document_Type extends Annotation_Type {
+public class Document_Type extends BaseAnnotation_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
@@ -43,42 +42,6 @@ public class Document_Type extends Annotation_Type {
      @modifiable */
   @SuppressWarnings ("hiding")
   public final static boolean featOkTst = JCasRegistry.getFeatOkTst("edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
- 
-  /** @generated */
-  final Feature casFeat_relevanceValue;
-  /** @generated */
-  final int     casFeatCode_relevanceValue;
-  /** @generated */ 
-  public int getRelevanceValue(int addr) {
-        if (featOkTst && casFeat_relevanceValue == null)
-      jcas.throwFeatMissing("relevanceValue", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
-    return ll_cas.ll_getIntValue(addr, casFeatCode_relevanceValue);
-  }
-  /** @generated */    
-  public void setRelevanceValue(int addr, int v) {
-        if (featOkTst && casFeat_relevanceValue == null)
-      jcas.throwFeatMissing("relevanceValue", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
-    ll_cas.ll_setIntValue(addr, casFeatCode_relevanceValue, v);}
-    
-  
- 
-  /** @generated */
-  final Feature casFeat_queryID;
-  /** @generated */
-  final int     casFeatCode_queryID;
-  /** @generated */ 
-  public int getQueryID(int addr) {
-        if (featOkTst && casFeat_queryID == null)
-      jcas.throwFeatMissing("queryID", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
-    return ll_cas.ll_getIntValue(addr, casFeatCode_queryID);
-  }
-  /** @generated */    
-  public void setQueryID(int addr, int v) {
-        if (featOkTst && casFeat_queryID == null)
-      jcas.throwFeatMissing("queryID", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
-    ll_cas.ll_setIntValue(addr, casFeatCode_queryID, v);}
-    
-  
  
   /** @generated */
   final Feature casFeat_text;
@@ -115,6 +78,42 @@ public class Document_Type extends Annotation_Type {
     ll_cas.ll_setRefValue(addr, casFeatCode_tokenList, v);}
     
   
+ 
+  /** @generated */
+  final Feature casFeat_relevance;
+  /** @generated */
+  final int     casFeatCode_relevance;
+  /** @generated */ 
+  public int getRelevance(int addr) {
+        if (featOkTst && casFeat_relevance == null)
+      jcas.throwFeatMissing("relevance", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    return ll_cas.ll_getRefValue(addr, casFeatCode_relevance);
+  }
+  /** @generated */    
+  public void setRelevance(int addr, int v) {
+        if (featOkTst && casFeat_relevance == null)
+      jcas.throwFeatMissing("relevance", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    ll_cas.ll_setRefValue(addr, casFeatCode_relevance, v);}
+    
+  
+ 
+  /** @generated */
+  final Feature casFeat_query;
+  /** @generated */
+  final int     casFeatCode_query;
+  /** @generated */ 
+  public int getQuery(int addr) {
+        if (featOkTst && casFeat_query == null)
+      jcas.throwFeatMissing("query", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    return ll_cas.ll_getRefValue(addr, casFeatCode_query);
+  }
+  /** @generated */    
+  public void setQuery(int addr, int v) {
+        if (featOkTst && casFeat_query == null)
+      jcas.throwFeatMissing("query", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    ll_cas.ll_setRefValue(addr, casFeatCode_query, v);}
+    
+  
 
 
 
@@ -125,20 +124,20 @@ public class Document_Type extends Annotation_Type {
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
  
-    casFeat_relevanceValue = jcas.getRequiredFeatureDE(casType, "relevanceValue", "uima.cas.Integer", featOkTst);
-    casFeatCode_relevanceValue  = (null == casFeat_relevanceValue) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_relevanceValue).getCode();
-
- 
-    casFeat_queryID = jcas.getRequiredFeatureDE(casType, "queryID", "uima.cas.Integer", featOkTst);
-    casFeatCode_queryID  = (null == casFeat_queryID) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_queryID).getCode();
-
- 
     casFeat_text = jcas.getRequiredFeatureDE(casType, "text", "uima.cas.String", featOkTst);
     casFeatCode_text  = (null == casFeat_text) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_text).getCode();
 
  
     casFeat_tokenList = jcas.getRequiredFeatureDE(casType, "tokenList", "uima.cas.FSList", featOkTst);
     casFeatCode_tokenList  = (null == casFeat_tokenList) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_tokenList).getCode();
+
+ 
+    casFeat_relevance = jcas.getRequiredFeatureDE(casType, "relevance", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Relevance", featOkTst);
+    casFeatCode_relevance  = (null == casFeat_relevance) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_relevance).getCode();
+
+ 
+    casFeat_query = jcas.getRequiredFeatureDE(casType, "query", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Query", featOkTst);
+    casFeatCode_query  = (null == casFeat_query) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_query).getCode();
 
   }
 }

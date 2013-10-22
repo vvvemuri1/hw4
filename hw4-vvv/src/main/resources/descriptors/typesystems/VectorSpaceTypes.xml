@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
   <name>VectorSpaceTypes</name>
   <description/>
@@ -8,18 +9,8 @@
     <typeDescription>
       <name>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document</name>
       <description/>
-      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <supertypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation</supertypeName>
       <features>
-        <featureDescription>
-          <name>relevanceValue</name>
-          <description/>
-          <rangeTypeName>uima.cas.Integer</rangeTypeName>
-        </featureDescription>
-        <featureDescription>
-          <name>queryID</name>
-          <description/>
-          <rangeTypeName>uima.cas.Integer</rangeTypeName>
-        </featureDescription>
         <featureDescription>
           <name>text</name>
           <description/>
@@ -31,12 +22,22 @@
           <rangeTypeName>uima.cas.FSList</rangeTypeName>
           <elementType>edu.cmu.vector_space.typesystems.Token</elementType>
         </featureDescription>
+      <featureDescription>
+          <name>relevance</name>
+          <description/>
+          <rangeTypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Relevance</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>query</name>
+          <description/>
+          <rangeTypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Query</rangeTypeName>
+        </featureDescription>
       </features>
     </typeDescription>
     <typeDescription>
       <name>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token</name>
       <description/>
-      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <supertypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation</supertypeName>
       <features>
         <featureDescription>
           <name>text</name>
@@ -45,6 +46,47 @@
         </featureDescription>
         <featureDescription>
           <name>frequency</name>
+          <description/>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+  <typeDescription>
+      <name>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation</name>
+      <description>Common core attributes shared by all types.</description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>CasProcessorId</name>
+          <description>componentId of creator.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>Confidence</name>
+          <description>Confidence of the creator in the correctness of the output on a scale of 0 to 1.0.</description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Relevance</name>
+      <description/>
+      <supertypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>relevanceValue</name>
+          <description/>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Query</name>
+      <description/>
+      <supertypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>queryId</name>
           <description/>
           <rangeTypeName>uima.cas.Integer</rangeTypeName>
         </featureDescription>

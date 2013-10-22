@@ -15,13 +15,13 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 
-		FSIterator<Annotation> iter = jcas.getAnnotationIndex().iterator();
-		if (iter.isValid()) {
+		FSIterator<Annotation> iter = jcas.getAnnotationIndex(Document.type).iterator();
+		if (iter.isValid()) 
+		{
 			iter.moveToNext();
 			Document doc = (Document) iter.get();
 			createTermFreqVector(jcas, doc);
 		}
-
 	}
 	/**
 	 * 

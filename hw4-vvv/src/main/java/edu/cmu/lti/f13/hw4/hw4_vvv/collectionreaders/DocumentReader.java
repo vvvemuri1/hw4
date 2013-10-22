@@ -1,20 +1,20 @@
 package edu.cmu.lti.f13.hw4.hw4_vvv.collectionreaders;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
+import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Query;
+import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Relevance;
 
-
-public class DocumentReader 
-extends JCasAnnotator_ImplBase  {
-	
+public class DocumentReader extends JCasAnnotator_ImplBase  {
+  
 	@Override
-	public void process(JCas jcas) 
-			throws AnalysisEngineProcessException {
+	public void process(JCas jcas) throws AnalysisEngineProcessException {
 		
 		// reading sentence from the CAS 
 		String sLine = jcas.getDocumentText();
@@ -24,36 +24,45 @@ extends JCasAnnotator_ImplBase  {
 		
 		//This is to make sure that parsing done properly and 
 		//minimal data for rel,qid,text are available to proceed 
-		if(docInfo.size()<3){
+		if(docInfo.size()<3)
+		{
 			System.err.println("Not enough information in the line");
 			return;
 		}
+		
 		int rel = Integer.parseInt(docInfo.get(0));
 		int qid = Integer.parseInt(docInfo.get(1));
 		String txt = docInfo.get(2);
 		
+    Query query = new Query(jcas);
+    query.setQueryId(qid);
+    
+    Relevance relevance = new Relevance(jcas);
+    relevance.setRelevanceValue(rel);
+		
 		Document doc = new Document(jcas);
 		doc.setText(txt);
-		doc.setQueryID(qid);
+		doc.setQuery(query);;
+		
 		//Setting relevance value
-		doc.setRelevanceValue(rel);
+		doc.setRelevance(relevance);
 		doc.addToIndexes();
 		
 		//Adding populated FeatureStructure to CAS
 		jcas.addFsToIndexes(doc);
 	}
 
-
-	public static ArrayList<String> parseDataLine(String line) {
+	public static ArrayList<String> parseDataLine(String line) 
+	{
 		ArrayList<String> docInfo;
 
 		String [] rec  = line.split("[\\t]");
 		String    sResQid = (rec[0]).replace("qid=", "");
 		String    sResRel = (rec[1]).replace("rel=", "");
 		
-
 		StringBuffer sResTxt = new StringBuffer();
-		for (int i=2; i<rec.length; i++) {
+		for (int i=2; i<rec.length; i++) 
+		{
 			sResTxt.append(rec[i]).append(" ");					
 		}
 
@@ -61,6 +70,7 @@ extends JCasAnnotator_ImplBase  {
 		docInfo.add(sResRel);
 		docInfo.add(sResQid);
 		docInfo.add(sResTxt.toString());
+		
 		return docInfo;
 	}
 

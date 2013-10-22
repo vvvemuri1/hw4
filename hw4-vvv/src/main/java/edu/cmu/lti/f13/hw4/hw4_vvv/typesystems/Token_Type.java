@@ -11,12 +11,11 @@ import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
-import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Fri Oct 11 01:58:03 EDT 2013
+ * Updated by JCasGen Tue Oct 22 12:08:50 EDT 2013
  * @generated */
-public class Token_Type extends Annotation_Type {
+public class Token_Type extends BaseAnnotation_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}

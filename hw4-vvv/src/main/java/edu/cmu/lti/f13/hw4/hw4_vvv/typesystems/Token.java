@@ -7,14 +7,11 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.TOP_Type;
 
-import org.apache.uima.jcas.tcas.Annotation;
-
-
 /** 
- * Updated by JCasGen Fri Oct 11 01:58:03 EDT 2013
- * XML source: /home/diwang/ur-workspace/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
+ * Updated by JCasGen Tue Oct 22 12:08:50 EDT 2013
+ * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
-public class Token extends Annotation {
+public class Token extends BaseAnnotation {
   /** @generated
    * @ordered 
    */
