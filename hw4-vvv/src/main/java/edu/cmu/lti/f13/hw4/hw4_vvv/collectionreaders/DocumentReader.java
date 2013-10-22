@@ -8,8 +8,6 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
-import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Query;
-import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Relevance;
 
 public class DocumentReader extends JCasAnnotator_ImplBase  {
   
@@ -33,19 +31,13 @@ public class DocumentReader extends JCasAnnotator_ImplBase  {
 		int rel = Integer.parseInt(docInfo.get(0));
 		int qid = Integer.parseInt(docInfo.get(1));
 		String txt = docInfo.get(2);
-		
-    Query query = new Query(jcas);
-    query.setQueryId(qid);
-    
-    Relevance relevance = new Relevance(jcas);
-    relevance.setRelevanceValue(rel);
-		
+				
 		Document doc = new Document(jcas);
 		doc.setText(txt);
-		doc.setQuery(query);;
+		doc.setQueryId(qid);
 		
 		//Setting relevance value
-		doc.setRelevance(relevance);
+		doc.setRelevanceValue(rel);
 		doc.addToIndexes();
 		
 		//Adding populated FeatureStructure to CAS

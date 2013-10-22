@@ -57,8 +57,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 			FSList fsTokenList = doc.getTokenList();
 			//ArrayList<Token>tokenList=Utils.fromFSListToCollection(fsTokenList, Token.class);
 
-			qIdList.add(doc.getQuery().getQueryId());
-			relList.add(doc.getRelevance().getRelevanceValue());
+			qIdList.add(doc.getQueryId());
+			relList.add(doc.getRelevanceValue());
 			
 			//Do something useful here
 

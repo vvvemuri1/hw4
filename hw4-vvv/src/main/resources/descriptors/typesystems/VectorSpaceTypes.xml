@@ -23,14 +23,14 @@
           <elementType>edu.cmu.vector_space.typesystems.Token</elementType>
         </featureDescription>
       <featureDescription>
-          <name>relevance</name>
+          <name>relevanceValue</name>
           <description/>
-          <rangeTypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Relevance</rangeTypeName>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
         </featureDescription>
         <featureDescription>
-          <name>query</name>
+          <name>queryId</name>
           <description/>
-          <rangeTypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Query</rangeTypeName>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
         </featureDescription>
       </features>
     </typeDescription>
@@ -68,29 +68,5 @@
         </featureDescription>
       </features>
     </typeDescription>
-    <typeDescription>
-      <name>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Relevance</name>
-      <description/>
-      <supertypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation</supertypeName>
-      <features>
-        <featureDescription>
-          <name>relevanceValue</name>
-          <description/>
-          <rangeTypeName>uima.cas.Integer</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-    <typeDescription>
-      <name>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Query</name>
-      <description/>
-      <supertypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation</supertypeName>
-      <features>
-        <featureDescription>
-          <name>queryId</name>
-          <description/>
-          <rangeTypeName>uima.cas.Integer</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-  </types>
+    </types>
 </typeSystemDescription>
