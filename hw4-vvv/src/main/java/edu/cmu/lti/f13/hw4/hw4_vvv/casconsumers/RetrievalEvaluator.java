@@ -2,6 +2,7 @@ package edu.cmu.lti.f13.hw4.hw4_vvv.casconsumers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.uima.cas.CAS;
@@ -15,6 +16,8 @@ import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
 
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
+import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
+import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
 
 public class RetrievalEvaluator extends CasConsumer_ImplBase 
 {
@@ -23,12 +26,18 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 
 	/** query and text relevant values **/
 	public ArrayList<Integer> relList;
+	
+	/** 
+	 * Global word dictionary that keeps track of the words and 
+	 * word frequencies in each sentence.
+	 */
+	public HashMap<String, HashMap<String, Integer>> globalWordDictionary;
 
-		
 	public void initialize() throws ResourceInitializationException 
 	{
 		qIdList = new ArrayList<Integer>();
 		relList = new ArrayList<Integer>();
+		globalWordDictionary = new HashMap<String, HashMap<String, Integer>>();
 	}
 
 	/**
@@ -50,17 +59,19 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 
 		FSIterator it = jcas.getAnnotationIndex(Document.type).iterator();
 	
-		if (it.hasNext()) {
+		if (it.hasNext()) 
+		{
 			Document doc = (Document) it.next();
 
 			//Make sure that your previous annotators have populated this in CAS
 			FSList fsTokenList = doc.getTokenList();
-			//ArrayList<Token>tokenList=Utils.fromFSListToCollection(fsTokenList, Token.class);
-
+			
 			qIdList.add(doc.getQueryId());
 			relList.add(doc.getRelevanceValue());
-			
-			//Do something useful here
+
+			// Populate the global word dictionary
+	    ArrayList<Token> tokenList = Utils.fromFSListToCollection(fsTokenList, 
+	            Token.class);
 		}
 	}
 
@@ -105,7 +116,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	 * 
 	 * @return mrr
 	 */
-	private double compute_mrr() {
+	private double compute_mrr() 
+	{
 		double metric_mrr=0.0;
 
 		// TODO :: compute Mean Reciprocal Rank (MRR) of the text collection

@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** Common core attributes shared by all types.
- * Updated by JCasGen Tue Oct 22 18:27:18 EDT 2013
+ * Updated by JCasGen Wed Oct 23 00:34:43 EDT 2013
  * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
 public class BaseAnnotation extends Annotation {

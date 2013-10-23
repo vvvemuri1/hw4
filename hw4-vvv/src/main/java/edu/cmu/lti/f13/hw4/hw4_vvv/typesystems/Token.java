@@ -8,7 +8,7 @@ import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.TOP_Type;
 
 /** 
- * Updated by JCasGen Tue Oct 22 18:27:19 EDT 2013
+ * Updated by JCasGen Wed Oct 23 00:34:44 EDT 2013
  * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
 public class Token extends BaseAnnotation {
@@ -93,6 +93,24 @@ public class Token extends BaseAnnotation {
     if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_frequency == null)
       jcasType.jcas.throwFeatMissing("frequency", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token");
     jcasType.ll_cas.ll_setIntValue(addr, ((Token_Type)jcasType).casFeatCode_frequency, v);}    
+   
+    
+  //*--------------*
+  //* Feature: queryId
+
+  /** getter for queryId - gets 
+   * @generated */
+  public int getQueryId() {
+    if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_queryId == null)
+      jcasType.jcas.throwFeatMissing("queryId", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token");
+    return jcasType.ll_cas.ll_getIntValue(addr, ((Token_Type)jcasType).casFeatCode_queryId);}
+    
+  /** setter for queryId - sets  
+   * @generated */
+  public void setQueryId(int v) {
+    if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_queryId == null)
+      jcasType.jcas.throwFeatMissing("queryId", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token");
+    jcasType.ll_cas.ll_setIntValue(addr, ((Token_Type)jcasType).casFeatCode_queryId, v);}    
   }
 
     

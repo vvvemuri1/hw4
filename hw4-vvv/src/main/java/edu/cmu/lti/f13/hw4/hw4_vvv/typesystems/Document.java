@@ -9,7 +9,7 @@ import org.apache.uima.jcas.cas.TOP_Type;
 import org.apache.uima.jcas.cas.FSList;
 
 /** 
- * Updated by JCasGen Tue Oct 22 18:27:18 EDT 2013
+ * Updated by JCasGen Wed Oct 23 00:34:44 EDT 2013
  * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
 public class Document extends BaseAnnotation {

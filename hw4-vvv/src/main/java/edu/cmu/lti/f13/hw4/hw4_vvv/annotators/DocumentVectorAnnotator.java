@@ -40,8 +40,8 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	}
 	
 	/**
-	 * Constructs a list of Tokens and populates them with the token text
-	 * and frequency of the token in the sentence.
+	 * Constructs a list of Tokens and populates them with the token text,
+	 * frequency of the token in the sentence and the query ID.
 	 * @param jcas JCas object that provides access to the CAS.
 	 * @param doc Document whose token texts and token frequencies we wish
 	 *            to determine.
@@ -76,6 +76,7 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 		for (Token token : tokenList)
 		{
 		  token.setFrequency(wordFrequency.get(token.getText()));
+		  token.setQueryId(doc.getQueryId());
 		}
 		
 		FSList fSList = Utils.fromCollectionToFSList(jcas, tokenList);
