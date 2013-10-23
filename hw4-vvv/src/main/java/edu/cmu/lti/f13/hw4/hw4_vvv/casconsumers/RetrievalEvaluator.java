@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIterator;
@@ -17,7 +16,6 @@ import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
-
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
 import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
@@ -108,8 +106,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	/**
 	 * Populate the Global dictionary using the tokens in the document
 	 * sentence.
-	 * @param fsTokenList List of tokens in the document sentence
-	 * @param docText Text contained in the document
+	 * @param fsTokenList List of tokens in the document sentence.
+	 * @param docText Text contained in the document.
 	 * @return void
 	 */
   private void populateGlobalDictionary(FSList fsTokenList, String docText) 
