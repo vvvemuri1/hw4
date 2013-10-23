@@ -14,8 +14,19 @@ import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
 import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
 
+/**
+ * This class extracts the token text and the token frequency values for each
+ * token in the sentence.
+ * @author Vinay Vyas Vemuri
+ */
 public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 
+  /**
+   * Extracts the token text and token frequency values for each token
+   * in a document.
+   * @param jcas JCas object that provides access to the CAS.
+   * @return void
+   */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 
@@ -29,9 +40,12 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	}
 	
 	/**
-	 * 
-	 * @param jcas
-	 * @param doc
+	 * Constructs a list of Tokens and populates them with the token text
+	 * and frequency of the token in the sentence.
+	 * @param jcas JCas object that provides access to the CAS.
+	 * @param doc Document whose token texts and token frequencies we wish
+	 *            to determine.
+	 * @return void
 	 */
 	private void createTermFreqVector(JCas jcas, Document doc) 
 	{

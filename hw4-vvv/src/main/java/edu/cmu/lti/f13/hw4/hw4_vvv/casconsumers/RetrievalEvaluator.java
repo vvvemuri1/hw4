@@ -16,9 +16,8 @@ import org.apache.uima.util.ProcessTrace;
 
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 
-
-public class RetrievalEvaluator extends CasConsumer_ImplBase {
-
+public class RetrievalEvaluator extends CasConsumer_ImplBase 
+{
 	/** query id number **/
 	public ArrayList<Integer> qIdList;
 
@@ -26,12 +25,10 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 	public ArrayList<Integer> relList;
 
 		
-	public void initialize() throws ResourceInitializationException {
-
+	public void initialize() throws ResourceInitializationException 
+	{
 		qIdList = new ArrayList<Integer>();
-
 		relList = new ArrayList<Integer>();
-
 	}
 
 	/**
@@ -42,9 +39,12 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 	public void processCas(CAS aCas) throws ResourceProcessException {
 
 		JCas jcas;
-		try {
+		try 
+		{
 			jcas =aCas.getJCas();
-		} catch (CASException e) {
+		} 
+		catch (CASException e) 
+		{
 			throw new ResourceProcessException(e);
 		}
 
@@ -61,9 +61,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 			relList.add(doc.getRelevanceValue());
 			
 			//Do something useful here
-
 		}
-
 	}
 
 	/**
