@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIterator;
@@ -16,6 +17,7 @@ import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
+
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
 import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
@@ -27,21 +29,26 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
   private static final Integer QUERY_TYPE = 99;
   
 	/** query id number **/
-	public ArrayList<Integer> qIdList;
+  private ArrayList<Integer> qIdList;
 
 	/** query and text relevant values **/
-	public ArrayList<Integer> relList;
+	private ArrayList<Integer> relList;
 	
 	/** 
 	 * Global word dictionary that keeps track of the words and 
 	 * word frequencies in each sentence.
 	 */
-	public HashMap<String, HashMap<String, Integer>> globalWordDictionary;
+	private HashMap<String, HashMap<String, Integer>> globalWordDictionary;
 
 	/**
 	 * Map of sentence to map of relevance values to Documents.
 	 */
-	public HashMap<Integer, HashMap<Integer, HashSet<String>>> relevanceToDocumentMap;
+	private HashMap<Integer, HashMap<Integer, HashSet<String>>> relevanceToDocumentMap;
+	
+	/**
+	 * Map of sentence to rank
+	 */
+  HashMap<String, Integer> sentenceToRankMap;
 	
 	/**
 	 * Initializes the list of query IDS, the list of relevance values and the
@@ -54,6 +61,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		relList = new ArrayList<Integer>();
 		globalWordDictionary = new HashMap<String, HashMap<String, Integer>>();
 		relevanceToDocumentMap = new HashMap<Integer, HashMap<Integer, HashSet<String>>>();
+		sentenceToRankMap = new HashMap<String, Integer>();
 	}
 
 	/**
@@ -153,6 +161,11 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	 * TODO 1. Compute Cosine Similarity and rank the retrieved sentences 2.
 	 * Compute the MRR metric
 	 */
+  /**
+   * Calculates the cosine similarity for each sentence and ranks the 
+   * @param trace
+   * @return Void
+   */
 	@Override
 	public void collectionProcessComplete(ProcessTrace trace)
 			throws ResourceProcessException, IOException 
@@ -186,35 +199,34 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		}
 		
 		// Compute the rank of retrieved sentences
-    ArrayList<String> rankedAnswers = rankAnswers(cosineSimilarities, correctAnswerMap, 
-            incorrectAnswerMap, queryQueryIDs);
+    rankAnswers(cosineSimilarities, correctAnswerMap, incorrectAnswerMap, queryQueryIDs);
     
-		
 		// Print score, rank, query ID, relevance and sentence
     for (Integer correctQueryID : correctQueryIDs)
     {
       HashSet<String> answers = correctAnswerMap.get(correctQueryID);
       for (String answer : answers)
       {
-        System.out.printf("Score: %.8f \t", cosineSimilarities.get(answer));
+        System.out.printf("Score: %.8f \t rank=%d ", cosineSimilarities.get(answer), 
+                (sentenceToRankMap.get(answer)));
         System.out.print("rel=" + CORRECT_TYPE + " qid=" + correctQueryID + " " + answer);
-        System.out.println();
         System.out.println();
       }
     }
     
-		// TODO :: compute the metric:: mean reciprocal rank
-		double metric_mrr = compute_mrr();
+		// Compute the mean reciprocal rank
+		double metric_mrr = compute_mrr(queryQueryIDs.size());
 		System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
 	}
 
-  private ArrayList<String> rankAnswers(HashMap<String, Double> cosineSimilarities,
+  private void rankAnswers(HashMap<String, Double> cosineSimilarities,
           HashMap<Integer, HashSet<String>> correctAnswerMap,
           HashMap<Integer, HashSet<String>> incorrectAnswerMap, Set<Integer> queryQueryIDs) 
-  {
-    ArrayList<String> rankedAnswers = new ArrayList<String>();
+  {    
 		for (Integer queryID : queryQueryIDs)
 		{
+	    ArrayList<String> rankedAnswers = new ArrayList<String>();
+
 		  HashSet<String> correctAnswers = new HashSet<String>();
 		  HashSet<String> incorrectAnswers = new HashSet<String>();
 		  HashSet<String> answers = new HashSet<String>();
@@ -237,24 +249,34 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
       while (unprocessedIter.hasNext())
       {
         String nextUnprocessed = unprocessedIter.next();
-        rankedAnswers.add(nextUnprocessed);
         
+        boolean added = false;
         for (int i = 0; i < rankedAnswers.size(); i++)
         {
-          if (i < (rankedAnswers.size() - 1) 
-           && cosineSimilarities.get(nextUnprocessed) > cosineSimilarities.get(rankedAnswers.get(i))
-           && cosineSimilarities.get(nextUnprocessed) < cosineSimilarities.get(rankedAnswers.get(i + 1)))
+          if (cosineSimilarities.get(nextUnprocessed) > cosineSimilarities.get(rankedAnswers.get(i)))
           {
-            rankedAnswers.remove(rankedAnswers.size() - 1);
             rankedAnswers.add(i, nextUnprocessed);
+            added = true;
+            break;
           }
+        }
+                
+        if (!added)
+        {
+          rankedAnswers.add(nextUnprocessed);
         }
         
         unprocessedIter.remove();
       }
+            
+      for (int i = 0; i < rankedAnswers.size(); i++)
+      {
+        if (correctAnswers.contains(rankedAnswers.get(i)))
+        {
+          sentenceToRankMap.put(rankedAnswers.get(i), (i + 1));
+        }
+      }
 		}
-		
-		return rankedAnswers;
   }
 
   private void computeCosineSimilarityForAnswers(HashMap<String, Double> cosineSimilarities, 
@@ -331,14 +353,22 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	}
 
 	/**
-	 * 
-	 * @return mrr
+	 * Calculates the minimum error rate.
+	 * @param numQueries Total number of queries.
+	 * @return mrr Calculated Mean Reciprocal Rank value.
 	 */
-	private double compute_mrr() 
+	private double compute_mrr(int numQueries) 
 	{
-		double metric_mrr=0.0;
-
-		// TODO :: compute Mean Reciprocal Rank (MRR) of the text collection
+		double metric_mrr = 0.0;
+		double numerator = 0;
+		Set<String> sentences = sentenceToRankMap.keySet();
+		
+		for (String sentence : sentences)
+		{
+		  numerator += sentenceToRankMap.get(sentence);
+		}
+		
+		metric_mrr = numerator/numQueries;
 		
 		return metric_mrr;
 	}
