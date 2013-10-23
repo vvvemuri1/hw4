@@ -79,7 +79,7 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 		  token.setQueryId(doc.getQueryId());
 		}
 		
-		FSList fSList = Utils.fromCollectionToFSList(jcas, tokenList);
-		jcas.addFsToIndexes(fSList);
+		FSList tokens = Utils.fromCollectionToFSList(jcas, tokenList);
+		doc.setTokenList(tokens);
 	}
 }

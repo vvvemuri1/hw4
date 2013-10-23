@@ -3,7 +3,9 @@ package edu.cmu.lti.f13.hw4.hw4_vvv.casconsumers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
@@ -33,6 +35,11 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	 */
 	public HashMap<String, HashMap<String, Integer>> globalWordDictionary;
 
+	/**
+	 * Initializes the list of query IDS, the list of relevance values and the
+	 * Global word dictionary.
+	 * @return void
+	 */
 	public void initialize() throws ResourceInitializationException 
 	{
 		qIdList = new ArrayList<Integer>();
@@ -41,12 +48,14 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	}
 
 	/**
-	 * TODO :: 1. construct the global word dictionary 2. keep the word
-	 * frequency for each sentence
+	 * Constructs the global word dictionary that maintains the list
+	 * of all words and their frequencies in each sentence.
+	 * @param aCas Cas Object
+	 * @return void
 	 */
 	@Override
-	public void processCas(CAS aCas) throws ResourceProcessException {
-
+	public void processCas(CAS aCas) throws ResourceProcessException 
+	{
 		JCas jcas;
 		try 
 		{
@@ -68,29 +77,52 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 			
 			qIdList.add(doc.getQueryId());
 			relList.add(doc.getRelevanceValue());
-
-			// Populate the global word dictionary
-	    ArrayList<Token> tokenList = Utils.fromFSListToCollection(fsTokenList, 
-	            Token.class);
+			
+			// Populate the global word dictionary			
+	    populateGlobalDictionary(fsTokenList);
 		}
 	}
+
+	/**
+	 * Populate the Global dictionary using the tokens in the document
+	 * sentence.
+	 * @param fsTokenList List of tokens in the document sentence
+	 */
+  private void populateGlobalDictionary(FSList fsTokenList) 
+  {
+    String sentence = "";
+    HashMap<String, Integer> wordFrequencies = new HashMap<String, Integer>();
+    ArrayList<Token> tokenList = Utils.fromFSListToCollection(fsTokenList, 
+            Token.class);
+    
+    for (Token token : tokenList)
+    {              
+      wordFrequencies.put(token.getText(), token.getFrequency());
+      sentence += " " + token.getText();
+    }
+    
+    if (sentence.length() != 0)
+    {
+      sentence = sentence.substring(1);
+    }
+    
+    globalWordDictionary.put(sentence, wordFrequencies);
+  }
 
 	/**
 	 * TODO 1. Compute Cosine Similarity and rank the retrieved sentences 2.
 	 * Compute the MRR metric
 	 */
 	@Override
-	public void collectionProcessComplete(ProcessTrace arg0)
-			throws ResourceProcessException, IOException {
-
-		super.collectionProcessComplete(arg0);
+	public void collectionProcessComplete(ProcessTrace trace)
+			throws ResourceProcessException, IOException 
+	{
+		super.collectionProcessComplete(trace);
 
 		// TODO :: compute the cosine similarity measure
-		
-		
+
 		
 		// TODO :: compute the rank of retrieved sentences
-		
 		
 		
 		// TODO :: compute the metric:: mean reciprocal rank
@@ -99,17 +131,58 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	}
 
 	/**
-	 * 
-	 * @return cosine_similarity
+	 * Calculates the cosine similarity between the queryVector and 
+	 * the document vector.
+	 * @return cosine_similarity Calculated cosine similarity value.
 	 */
-	private double computeCosineSimilarity(Map<String, Integer> queryVector,
-			Map<String, Integer> docVector) {
-		double cosine_similarity=0.0;
-
-		// TODO :: compute cosine similarity between two sentences
+  private double computeCosineSimilarity(Map<String, Integer> queryVector,
+			Map<String, Integer> docVector) 
+	{		
+		ArrayList<Integer> queryFrequencyVector = new ArrayList<Integer>();
+    ArrayList<Integer> docFrequencyVector = new ArrayList<Integer>();
 		
-
-		return cosine_similarity;
+		Set<String> words = new HashSet<String>();
+		words.addAll(queryVector.keySet());
+		words.addAll(docVector.keySet());
+		
+		for (String word : words)
+		{
+		  if (queryVector.containsKey(word))
+		  {
+	      queryFrequencyVector.add(queryVector.get(word));
+		  }
+		  else
+		  {
+        queryFrequencyVector.add(0);
+		  }
+		  
+		  if (docVector.containsKey(word))
+		  {
+		    docFrequencyVector.add(docVector.get(word));
+		  }
+		  else
+		  {
+		    docFrequencyVector.add(0);
+		  }
+		}
+		
+		double dotProduct = 0;
+		double queryFrequenciesMagnitude = 0;
+		double docFrequenciesMagnitude = 0;
+		
+		for (int i = 0; i < queryFrequencyVector.size(); i++)
+		{
+		  dotProduct += queryFrequencyVector.get(i) * docFrequencyVector.get(i);
+		  queryFrequenciesMagnitude += queryFrequencyVector.get(i) * 
+		          queryFrequencyVector.get(i);
+		  docFrequenciesMagnitude += docFrequencyVector.get(i) * 
+		          docFrequencyVector.get(i);
+		}
+		
+		queryFrequenciesMagnitude = Math.sqrt(queryFrequenciesMagnitude);
+		docFrequenciesMagnitude = Math.sqrt(docFrequenciesMagnitude);
+		
+		return dotProduct/(queryFrequenciesMagnitude * docFrequenciesMagnitude);
 	}
 
 	/**
