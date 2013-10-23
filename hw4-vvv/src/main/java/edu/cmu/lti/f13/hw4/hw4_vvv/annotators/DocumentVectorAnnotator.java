@@ -1,21 +1,25 @@
 package edu.cmu.lti.f13.hw4.hw4_vvv.annotators;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.IntegerArray;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.tcas.Annotation;
-
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
+import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
+import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
 
 public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 
-		FSIterator<Annotation> iter = jcas.getAnnotationIndex(Document.type).iterator();
+		FSIterator<Annotation> iter = jcas.getAnnotationIndex().iterator();
 		if (iter.isValid()) 
 		{
 			iter.moveToNext();
@@ -23,19 +27,44 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 			createTermFreqVector(jcas, doc);
 		}
 	}
+	
 	/**
 	 * 
 	 * @param jcas
 	 * @param doc
 	 */
-
-	private void createTermFreqVector(JCas jcas, Document doc) {
-
+	private void createTermFreqVector(JCas jcas, Document doc) 
+	{
 		String docText = doc.getText();
+		StringTokenizer st = new StringTokenizer(docText);
+		Collection<Token> tokenList = new LinkedList<Token>();
 		
-		//TO DO: construct a vector of tokens and update the tokenList in CAS
+		HashMap<String, Integer> wordFrequency = new HashMap<String, Integer>();
 		
-
+		while (st.hasMoreTokens())
+		{
+		  String tokenText = st.nextToken();
+		  Token token = new Token(jcas);
+		  token.setText(tokenText);
+		  
+		  if (wordFrequency.containsKey(tokenText))
+		  {
+		    wordFrequency.put(token.getText(), 
+		            wordFrequency.get(token.getText()) + 1);
+		  }
+		  else
+		  {
+		    wordFrequency.put(token.getText(), 1);
+		    tokenList.add(token);
+		  }
+		}
+		
+		for (Token token : tokenList)
+		{
+		  token.setFrequency(wordFrequency.get(token.getText()));
+		}
+		
+		FSList fSList = Utils.fromCollectionToFSList(jcas, tokenList);
+		jcas.addFsToIndexes(fSList);
 	}
-
 }

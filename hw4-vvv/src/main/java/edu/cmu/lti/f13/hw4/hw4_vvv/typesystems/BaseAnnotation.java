@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** Common core attributes shared by all types.
- * Updated by JCasGen Tue Oct 22 12:19:25 EDT 2013
+ * Updated by JCasGen Tue Oct 22 18:27:18 EDT 2013
  * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
 public class BaseAnnotation extends Annotation {
@@ -63,39 +63,39 @@ public class BaseAnnotation extends Annotation {
  
     
   //*--------------*
-  //* Feature: CasProcessorId
+  //* Feature: casProcessorId
 
-  /** getter for CasProcessorId - gets componentId of creator.
+  /** getter for casProcessorId - gets componentId of creator.
    * @generated */
   public String getCasProcessorId() {
-    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_CasProcessorId == null)
-      jcasType.jcas.throwFeatMissing("CasProcessorId", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
-    return jcasType.ll_cas.ll_getStringValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_CasProcessorId);}
+    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_casProcessorId == null)
+      jcasType.jcas.throwFeatMissing("casProcessorId", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
+    return jcasType.ll_cas.ll_getStringValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_casProcessorId);}
     
-  /** setter for CasProcessorId - sets componentId of creator. 
+  /** setter for casProcessorId - sets componentId of creator. 
    * @generated */
   public void setCasProcessorId(String v) {
-    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_CasProcessorId == null)
-      jcasType.jcas.throwFeatMissing("CasProcessorId", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
-    jcasType.ll_cas.ll_setStringValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_CasProcessorId, v);}    
+    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_casProcessorId == null)
+      jcasType.jcas.throwFeatMissing("casProcessorId", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
+    jcasType.ll_cas.ll_setStringValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_casProcessorId, v);}    
    
     
   //*--------------*
-  //* Feature: Confidence
+  //* Feature: confidence
 
-  /** getter for Confidence - gets Confidence of the creator in the correctness of the output on a scale of 0 to 1.0.
+  /** getter for confidence - gets Confidence of the creator in the correctness of the output on a scale of 0 to 1.0.
    * @generated */
   public float getConfidence() {
-    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_Confidence == null)
-      jcasType.jcas.throwFeatMissing("Confidence", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
-    return jcasType.ll_cas.ll_getFloatValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_Confidence);}
+    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_confidence == null)
+      jcasType.jcas.throwFeatMissing("confidence", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
+    return jcasType.ll_cas.ll_getFloatValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_confidence);}
     
-  /** setter for Confidence - sets Confidence of the creator in the correctness of the output on a scale of 0 to 1.0. 
+  /** setter for confidence - sets Confidence of the creator in the correctness of the output on a scale of 0 to 1.0. 
    * @generated */
   public void setConfidence(float v) {
-    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_Confidence == null)
-      jcasType.jcas.throwFeatMissing("Confidence", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
-    jcasType.ll_cas.ll_setFloatValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_Confidence, v);}    
+    if (BaseAnnotation_Type.featOkTst && ((BaseAnnotation_Type)jcasType).casFeat_confidence == null)
+      jcasType.jcas.throwFeatMissing("confidence", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.BaseAnnotation");
+    jcasType.ll_cas.ll_setFloatValue(addr, ((BaseAnnotation_Type)jcasType).casFeatCode_confidence, v);}    
   }
 
     

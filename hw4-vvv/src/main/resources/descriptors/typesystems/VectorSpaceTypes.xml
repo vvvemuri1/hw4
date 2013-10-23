@@ -57,12 +57,12 @@
       <supertypeName>uima.tcas.Annotation</supertypeName>
       <features>
         <featureDescription>
-          <name>CasProcessorId</name>
+          <name>casProcessorId</name>
           <description>componentId of creator.</description>
           <rangeTypeName>uima.cas.String</rangeTypeName>
         </featureDescription>
         <featureDescription>
-          <name>Confidence</name>
+          <name>confidence</name>
           <description>Confidence of the creator in the correctness of the output on a scale of 0 to 1.0.</description>
           <rangeTypeName>uima.cas.Float</rangeTypeName>
         </featureDescription>

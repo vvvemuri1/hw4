@@ -1,8 +1,6 @@
 package edu.cmu.lti.f13.hw4.hw4_vvv.collectionreaders;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;

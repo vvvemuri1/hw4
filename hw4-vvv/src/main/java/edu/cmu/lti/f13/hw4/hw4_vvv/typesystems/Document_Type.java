@@ -13,7 +13,7 @@ import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
 
 /** 
- * Updated by JCasGen Tue Oct 22 12:19:25 EDT 2013
+ * Updated by JCasGen Tue Oct 22 18:27:18 EDT 2013
  * @generated */
 public class Document_Type extends BaseAnnotation_Type {
   /** @generated */
