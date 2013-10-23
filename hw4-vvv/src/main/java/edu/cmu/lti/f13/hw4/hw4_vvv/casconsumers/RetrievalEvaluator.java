@@ -110,6 +110,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	 * sentence.
 	 * @param fsTokenList List of tokens in the document sentence
 	 * @param docText Text contained in the document
+	 * @return void
 	 */
   private void populateGlobalDictionary(FSList fsTokenList, String docText) 
   {
@@ -128,6 +129,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
   /**
    * Populates the relevanceToDocumentMap by mapping documents of each type
    * to the list of all documents of that type.
+   * @param doc Document object for which we wish to construct a relevance to
+   * document map.
+   * @return void
    */
   private void populateRelevanceToDocumentMap(Document doc)
   {
@@ -157,14 +161,12 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
     }
   }
 
-	/**
-	 * TODO 1. Compute Cosine Similarity and rank the retrieved sentences 2.
-	 * Compute the MRR metric
-	 */
   /**
-   * Calculates the cosine similarity for each sentence and ranks the 
-   * @param trace
-   * @return Void
+   * Calculates the cosine similarity for each sentence and ranks the retrieved
+   * sentences. Uses the ranked sentences to calculate the MRR value.
+   * @param trace Object that provides access to information about all the events
+   * that have occurred.
+   * @return void
    */
 	@Override
 	public void collectionProcessComplete(ProcessTrace trace)
@@ -219,6 +221,15 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
 	}
 
+	/**
+	 * Helper function that ranks all the answers using their cosine scores and populates
+	 * the sentenceToRankMap using the calculated ranks.
+	 * @param cosineSimilarities Mapping from sentence to computed cosine similarity.
+	 * @param correctAnswerMap Mapping from queryID to a set of correct answers.
+	 * @param incorrectAnswerMap Mapping from queryID to a set of incorrect answers.
+	 * @param queryQueryIDs List of query IDs across all the documents.
+	 * @return void
+	 */
   private void rankAnswers(HashMap<String, Double> cosineSimilarities,
           HashMap<Integer, HashSet<String>> correctAnswerMap,
           HashMap<Integer, HashSet<String>> incorrectAnswerMap, Set<Integer> queryQueryIDs) 
@@ -279,6 +290,17 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		}
   }
 
+  /**
+   * Helper function that computes the cosine similarity for all the answers.
+   * @param cosineSimilarities Map which is loaded with the cosine similarity values
+   * @param queryQueryID Query ID of the query for whose answers we are computing cosine
+   *        similarities. 
+   * @param query Text contained in query
+   * @param queryVector Mapping from token to token frequency
+   * @param answerMap Mapping from answer query ID to a list of sentences.
+   * @param answerQueryIDs List of all answer query IDs
+   * @return void
+   */
   private void computeCosineSimilarityForAnswers(HashMap<String, Double> cosineSimilarities, 
           Integer queryQueryID, String query, Map<String, Integer> queryVector, HashMap<Integer, 
           HashSet<String>> answerMap, Set<Integer> answerQueryIDs) 
@@ -353,7 +375,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	}
 
 	/**
-	 * Calculates the minimum error rate.
+	 * Calculates the mean reciprocal rank for all sentences.
 	 * @param numQueries Total number of queries.
 	 * @return mrr Calculated Mean Reciprocal Rank value.
 	 */
