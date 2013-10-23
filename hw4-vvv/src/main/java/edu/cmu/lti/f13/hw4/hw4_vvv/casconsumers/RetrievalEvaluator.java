@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +18,7 @@ import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
+import org.apache.uima.util.ProcessTraceEvent;
 
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
@@ -23,6 +26,10 @@ import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
 
 public class RetrievalEvaluator extends CasConsumer_ImplBase 
 {
+  private static final Integer WRONG_TYPE = 0;
+  private static final Integer CORRECT_TYPE = 1;
+  private static final Integer QUERY_TYPE = 99;
+  
 	/** query id number **/
 	public ArrayList<Integer> qIdList;
 
@@ -36,6 +43,11 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	public HashMap<String, HashMap<String, Integer>> globalWordDictionary;
 
 	/**
+	 * Map of sentence to map of relevance values to Documents.
+	 */
+	public HashMap<Integer, HashMap<Integer, HashSet<String>>> relevanceToDocumentMap;
+	
+	/**
 	 * Initializes the list of query IDS, the list of relevance values and the
 	 * Global word dictionary.
 	 * @return void
@@ -45,12 +57,15 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		qIdList = new ArrayList<Integer>();
 		relList = new ArrayList<Integer>();
 		globalWordDictionary = new HashMap<String, HashMap<String, Integer>>();
+		relevanceToDocumentMap = new HashMap<Integer, HashMap<Integer, HashSet<String>>>();
 	}
 
 	/**
 	 * Constructs the global word dictionary that maintains the list
-	 * of all words and their frequencies in each sentence.
-	 * @param aCas Cas Object
+	 * of all words and their frequencies in each sentence. Also populates the
+	 * relevanceToDocumentMap that maps each relevance value to map of queryIDs and
+	 * corresponding sentence texts.
+	 * @param aCas CAS Object
 	 * @return void
 	 */
 	@Override
@@ -80,6 +95,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 			
 			// Populate the global word dictionary			
 	    populateGlobalDictionary(fsTokenList);
+	    
+	    // Populate the sentence to Query ID map
+	    populateRelevanceToDocumentMap(doc);
 		}
 	}
 
@@ -108,6 +126,38 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
     
     globalWordDictionary.put(sentence, wordFrequencies);
   }
+  
+  /**
+   * Populates the relevanceToDocumentMap by mapping documents of each type
+   * to the list of all documents of that type.
+   */
+  private void populateRelevanceToDocumentMap(Document doc)
+  {
+    if (relevanceToDocumentMap.containsKey(doc.getRelevanceValue()))
+    {
+      HashMap<Integer, HashSet<String>> queryIDToText = relevanceToDocumentMap.get(doc.getRelevanceValue());
+      if (queryIDToText.containsKey(doc.getQueryId()))
+      {
+        queryIDToText.get(doc.getQueryId()).add(doc.getText());
+      }
+      else
+      {
+        HashSet<String> set = new HashSet<String>();
+        set.add(doc.getText());
+        queryIDToText.put(doc.getQueryId(), set);
+      }
+    }
+    else
+    {
+      HashMap<Integer, HashSet<String>> queryIDToText = new HashMap<Integer, HashSet<String>>();
+      HashSet<String> set = new HashSet<String>();
+     
+      set.add(doc.getText());
+      queryIDToText.put(doc.getQueryId(), set);
+      
+      relevanceToDocumentMap.put(doc.getRelevanceValue(), queryIDToText);
+    }
+  }
 
 	/**
 	 * TODO 1. Compute Cosine Similarity and rank the retrieved sentences 2.
@@ -119,8 +169,20 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	{
 		super.collectionProcessComplete(trace);
 
-		// TODO :: compute the cosine similarity measure
-
+		// Compute cosine similarity
+		HashMap<Integer, HashSet<String>> queryMap = relevanceToDocumentMap.get(QUERY_TYPE);
+		Set<Integer> queryQueryIDs = queryMap.keySet();
+		for (Integer queryQueryID : queryQueryIDs)
+		{
+		  Iterator<String> iter = queryMap.get(queryQueryID).iterator();
+		  String query = iter.next();
+		  Map<String, Integer> queryVector = globalWordDictionary.get(query);
+		  
+		  // Correct Answers
+		  HashMap<Integer, HashSet<String>> correctMap = relevanceToDocumentMap.get(CORRECT_TYPE);
+	    Set<Integer> correctQueryIDs = correctMap.keySet();
+	    //for () 
+		}
 		
 		// TODO :: compute the rank of retrieved sentences
 		
