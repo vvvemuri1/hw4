@@ -26,7 +26,7 @@ import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
 
 public class RetrievalEvaluator extends CasConsumer_ImplBase 
 {
-  private static final Integer WRONG_TYPE = 0;
+  private static final Integer INCORRECT_TYPE = 0;
   private static final Integer CORRECT_TYPE = 1;
   private static final Integer QUERY_TYPE = 99;
   
@@ -94,7 +94,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 			relList.add(doc.getRelevanceValue());
 			
 			// Populate the global word dictionary			
-	    populateGlobalDictionary(fsTokenList);
+	    populateGlobalDictionary(fsTokenList, doc.getText());
 	    
 	    // Populate the sentence to Query ID map
 	    populateRelevanceToDocumentMap(doc);
@@ -105,10 +105,10 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	 * Populate the Global dictionary using the tokens in the document
 	 * sentence.
 	 * @param fsTokenList List of tokens in the document sentence
+	 * @param docText Text contained in the document
 	 */
-  private void populateGlobalDictionary(FSList fsTokenList) 
+  private void populateGlobalDictionary(FSList fsTokenList, String docText) 
   {
-    String sentence = "";
     HashMap<String, Integer> wordFrequencies = new HashMap<String, Integer>();
     ArrayList<Token> tokenList = Utils.fromFSListToCollection(fsTokenList, 
             Token.class);
@@ -116,15 +116,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
     for (Token token : tokenList)
     {              
       wordFrequencies.put(token.getText(), token.getFrequency());
-      sentence += " " + token.getText();
     }
-    
-    if (sentence.length() != 0)
-    {
-      sentence = sentence.substring(1);
-    }
-    
-    globalWordDictionary.put(sentence, wordFrequencies);
+        
+    globalWordDictionary.put(docText, wordFrequencies);
   }
   
   /**
@@ -170,7 +164,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		super.collectionProcessComplete(trace);
 
 		// Compute cosine similarity
+		HashMap<String, HashMap<String, Double>> cosineSimilarities = new HashMap<String, HashMap<String, Double>>();
 		HashMap<Integer, HashSet<String>> queryMap = relevanceToDocumentMap.get(QUERY_TYPE);
+
 		Set<Integer> queryQueryIDs = queryMap.keySet();
 		for (Integer queryQueryID : queryQueryIDs)
 		{
@@ -179,18 +175,45 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		  Map<String, Integer> queryVector = globalWordDictionary.get(query);
 		  
 		  // Correct Answers
-		  HashMap<Integer, HashSet<String>> correctMap = relevanceToDocumentMap.get(CORRECT_TYPE);
-	    Set<Integer> correctQueryIDs = correctMap.keySet();
-	    //for () 
+		  HashMap<Integer, HashSet<String>> correctAnswerMap = relevanceToDocumentMap.get(CORRECT_TYPE);
+	    Set<Integer> correctQueryIDs = correctAnswerMap.keySet();
+	    computeCosineSimilarityForAnswers(cosineSimilarities, queryQueryID, query, queryVector,
+	            correctAnswerMap, correctQueryIDs);
+	    
+	     // Incorrect Answers
+      HashMap<Integer, HashSet<String>> incorrectAnswerMap = relevanceToDocumentMap.get(INCORRECT_TYPE);
+      Set<Integer> incorrectQueryIDs = incorrectAnswerMap.keySet();
+	    computeCosineSimilarityForAnswers(cosineSimilarities, queryQueryID, query, queryVector,
+	            incorrectAnswerMap, incorrectQueryIDs);
 		}
 		
-		// TODO :: compute the rank of retrieved sentences
+		// Compute the rank of retrieved sentences
 		
 		
 		// TODO :: compute the metric:: mean reciprocal rank
 		double metric_mrr = compute_mrr();
 		System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
 	}
+
+  private void computeCosineSimilarityForAnswers(HashMap<String, HashMap<String, Double>> cosineSimilarities, 
+          Integer queryQueryID, String query, Map<String, Integer> queryVector, HashMap<Integer, 
+          HashSet<String>> answerMap, Set<Integer> answerQueryIDs) 
+  {
+    for (Integer answerQueryID : answerQueryIDs)
+    {
+      if (answerQueryID == queryQueryID)
+      {
+        HashSet<String> sentences = answerMap.get(answerQueryID);
+        for (String sentence : sentences)
+        {
+          Map<String, Integer> docVector = globalWordDictionary.get(sentence);
+          HashMap<String, Double> innerMap = new HashMap<String, Double>();
+          innerMap.put(sentence, computeCosineSimilarity(queryVector, docVector));
+          cosineSimilarities.put(query, innerMap);
+        }
+      }
+    }
+  }
 
 	/**
 	 * Calculates the cosine similarity between the queryVector and 
