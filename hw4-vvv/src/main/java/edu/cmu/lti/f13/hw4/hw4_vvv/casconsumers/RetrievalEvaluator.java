@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIterator;
@@ -164,8 +162,14 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		super.collectionProcessComplete(trace);
 
 		// Compute cosine similarity
-		HashMap<String, HashMap<String, Double>> cosineSimilarities = new HashMap<String, HashMap<String, Double>>();
+		HashMap<String, Double> cosineSimilarities = new HashMap<String, Double>();
 		HashMap<Integer, HashSet<String>> queryMap = relevanceToDocumentMap.get(QUERY_TYPE);
+		
+    HashMap<Integer, HashSet<String>> correctAnswerMap = relevanceToDocumentMap.get(CORRECT_TYPE);
+    Set<Integer> correctQueryIDs = correctAnswerMap.keySet();
+    
+    HashMap<Integer, HashSet<String>> incorrectAnswerMap = relevanceToDocumentMap.get(INCORRECT_TYPE);
+    Set<Integer> incorrectQueryIDs = incorrectAnswerMap.keySet();
 
 		Set<Integer> queryQueryIDs = queryMap.keySet();
 		for (Integer queryQueryID : queryQueryIDs)
@@ -175,14 +179,10 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		  Map<String, Integer> queryVector = globalWordDictionary.get(query);
 		  
 		  // Correct Answers
-		  HashMap<Integer, HashSet<String>> correctAnswerMap = relevanceToDocumentMap.get(CORRECT_TYPE);
-	    Set<Integer> correctQueryIDs = correctAnswerMap.keySet();
 	    computeCosineSimilarityForAnswers(cosineSimilarities, queryQueryID, query, queryVector,
 	            correctAnswerMap, correctQueryIDs);
 	    
 	     // Incorrect Answers
-      HashMap<Integer, HashSet<String>> incorrectAnswerMap = relevanceToDocumentMap.get(INCORRECT_TYPE);
-      Set<Integer> incorrectQueryIDs = incorrectAnswerMap.keySet();
 	    computeCosineSimilarityForAnswers(cosineSimilarities, queryQueryID, query, queryVector,
 	            incorrectAnswerMap, incorrectQueryIDs);
 		}
@@ -190,12 +190,38 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		// Compute the rank of retrieved sentences
 		
 		
+		// Print score, rank, query ID, relevance and sentence
+    for (Integer correctQueryID : correctQueryIDs)
+    {
+      HashSet<String> answers = correctAnswerMap.get(correctQueryID);
+      for (String answer : answers)
+      {
+        System.out.printf("Score: %.8f \t", cosineSimilarities.get(answer));
+        System.out.print("rel=" + CORRECT_TYPE + " qid=" + correctQueryID + " " + answer);
+        System.out.println();
+        System.out.println();
+      }
+    }
+    
+    for (Integer incorrectQueryID : incorrectQueryIDs)
+    {
+      HashSet<String> answers = incorrectAnswerMap.get(incorrectQueryID);
+      for (String answer : answers)
+      {
+        System.out.printf("Score: %.8f \t", cosineSimilarities.get(answer));
+        System.out.print("rel=" + INCORRECT_TYPE + " qid=" + incorrectQueryID + " " + answer);
+        System.out.println();
+        System.out.println();
+      }
+    }
+
+		
 		// TODO :: compute the metric:: mean reciprocal rank
 		double metric_mrr = compute_mrr();
 		System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
 	}
 
-  private void computeCosineSimilarityForAnswers(HashMap<String, HashMap<String, Double>> cosineSimilarities, 
+  private void computeCosineSimilarityForAnswers(HashMap<String, Double> cosineSimilarities, 
           Integer queryQueryID, String query, Map<String, Integer> queryVector, HashMap<Integer, 
           HashSet<String>> answerMap, Set<Integer> answerQueryIDs) 
   {
@@ -207,9 +233,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
         for (String sentence : sentences)
         {
           Map<String, Integer> docVector = globalWordDictionary.get(sentence);
-          HashMap<String, Double> innerMap = new HashMap<String, Double>();
-          innerMap.put(sentence, computeCosineSimilarity(queryVector, docVector));
-          cosineSimilarities.put(query, innerMap);
+          cosineSimilarities.put(sentence, computeCosineSimilarity(queryVector, docVector));
         }
       }
     }
