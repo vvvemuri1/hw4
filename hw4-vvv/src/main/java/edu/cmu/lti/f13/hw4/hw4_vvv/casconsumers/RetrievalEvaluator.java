@@ -16,8 +16,6 @@ import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
-import org.apache.uima.util.ProcessTraceEvent;
-
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
 import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
@@ -188,7 +186,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		}
 		
 		// Compute the rank of retrieved sentences
-		
+    ArrayList<String> rankedAnswers = rankAnswers(cosineSimilarities, correctAnswerMap, 
+            incorrectAnswerMap, queryQueryIDs);
+    
 		
 		// Print score, rank, query ID, relevance and sentence
     for (Integer correctQueryID : correctQueryIDs)
@@ -203,23 +203,59 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
       }
     }
     
-    for (Integer incorrectQueryID : incorrectQueryIDs)
-    {
-      HashSet<String> answers = incorrectAnswerMap.get(incorrectQueryID);
-      for (String answer : answers)
-      {
-        System.out.printf("Score: %.8f \t", cosineSimilarities.get(answer));
-        System.out.print("rel=" + INCORRECT_TYPE + " qid=" + incorrectQueryID + " " + answer);
-        System.out.println();
-        System.out.println();
-      }
-    }
-
-		
 		// TODO :: compute the metric:: mean reciprocal rank
 		double metric_mrr = compute_mrr();
 		System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
 	}
+
+  private ArrayList<String> rankAnswers(HashMap<String, Double> cosineSimilarities,
+          HashMap<Integer, HashSet<String>> correctAnswerMap,
+          HashMap<Integer, HashSet<String>> incorrectAnswerMap, Set<Integer> queryQueryIDs) 
+  {
+    ArrayList<String> rankedAnswers = new ArrayList<String>();
+		for (Integer queryID : queryQueryIDs)
+		{
+		  HashSet<String> correctAnswers = new HashSet<String>();
+		  HashSet<String> incorrectAnswers = new HashSet<String>();
+		  HashSet<String> answers = new HashSet<String>();
+		  
+		  if (correctAnswerMap.containsKey(queryID))
+		  {
+		    correctAnswers = correctAnswerMap.get(queryID);
+		  }
+		  
+		  if (incorrectAnswerMap.containsKey(queryID))
+		  {
+		    incorrectAnswers = incorrectAnswerMap.get(queryID);
+		  }
+		  
+		  answers.addAll(correctAnswers);
+		  answers.addAll(incorrectAnswers);
+		  
+		  Iterator<String> unprocessedIter = answers.iterator();
+      
+      while (unprocessedIter.hasNext())
+      {
+        String nextUnprocessed = unprocessedIter.next();
+        rankedAnswers.add(nextUnprocessed);
+        
+        for (int i = 0; i < rankedAnswers.size(); i++)
+        {
+          if (i < (rankedAnswers.size() - 1) 
+           && cosineSimilarities.get(nextUnprocessed) > cosineSimilarities.get(rankedAnswers.get(i))
+           && cosineSimilarities.get(nextUnprocessed) < cosineSimilarities.get(rankedAnswers.get(i + 1)))
+          {
+            rankedAnswers.remove(rankedAnswers.size() - 1);
+            rankedAnswers.add(i, nextUnprocessed);
+          }
+        }
+        
+        unprocessedIter.remove();
+      }
+		}
+		
+		return rankedAnswers;
+  }
 
   private void computeCosineSimilarityForAnswers(HashMap<String, Double> cosineSimilarities, 
           Integer queryQueryID, String query, Map<String, Integer> queryVector, HashMap<Integer, 
