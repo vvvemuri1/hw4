@@ -66,8 +66,10 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	       bigram.setSecondToken(token);
 	       bigramList.add(bigram);
 	     }
+	     
+       prevToken = token;
 	   }
-	   
+	   	   
 	   FSList bigrams = Utils.fromCollectionToFSList(jcas, bigramList);
 	   doc.setBigramList(bigrams);
 	}

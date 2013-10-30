@@ -55,8 +55,18 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
   /**
    * Hash Map of sentence to collection of Bigrams
    */
-  private HashMap<String, Collection<Bigram>> sentenceToBigramMap;
+  private HashMap<String, Collection<String>> textToBigramMap;
   
+  /**
+   * Hash Map of sentence to relevance value
+   */
+  private HashMap<String, Integer> sentenceToRelevanceMap;
+  
+  /**
+   * Hash Map of sentence to queryID
+   */
+  private HashMap<String, Integer> sentenceToQueryIDMap;
+
 	/**
 	 * Initializes the list of query IDS, the list of relevance values and the
 	 * Global word dictionary.
@@ -69,6 +79,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		globalWordDictionary = new HashMap<String, HashMap<String, Integer>>();
 		relevanceToDocumentMap = new HashMap<Integer, HashMap<Integer, HashSet<String>>>();
 		sentenceToRankMap = new HashMap<String, Integer>();
+		textToBigramMap = new HashMap<String, Collection<String>>();
+		sentenceToRelevanceMap = new HashMap<String, Integer> ();
+		sentenceToQueryIDMap = new HashMap<String, Integer> ();
 	}
 
 	/**
@@ -105,7 +118,25 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 			relList.add(doc.getRelevanceValue());
 			
 			// Add list of Bigrams corresponding to sentence to sentenceToBigramMap
-			sentenceToBigramMap.put(doc.getText(), Utils.fromFSListToCollection(doc.getBigramList(), Bigram.class));
+			Collection<Bigram> bigrams = Utils.fromFSListToCollection(doc.getBigramList(), Bigram.class);
+			
+			// Add to textToBigramMap and sentenceToQueryIDMap
+			String bigramStrings = "";
+			HashSet<String> bigramStringCollection = new HashSet<String>();
+			
+			for (Bigram bigram : bigrams)
+			{
+			  bigramStrings = bigram.getFirstToken().getText();
+			  bigramStrings += (bigram.getSecondToken().getText());
+			}
+			
+			bigramStringCollection.add(bigramStrings);
+			
+			textToBigramMap.put(doc.getText(), bigramStringCollection);
+			sentenceToQueryIDMap.put(doc.getText(), doc.getQueryId());
+			
+			// Add Sentence and relevance value to sentenceToRelevanceMap
+			sentenceToRelevanceMap.put(doc.getText(), doc.getRelevanceValue());
 			
 			// Populate the global word dictionary			
 	    populateGlobalDictionary(fsTokenList, doc.getText());
@@ -147,7 +178,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
   {
     if (relevanceToDocumentMap.containsKey(doc.getRelevanceValue()))
     {
-      HashMap<Integer, HashSet<String>> queryIDToText = relevanceToDocumentMap.get(doc.getRelevanceValue());
+      HashMap<Integer, HashSet<String>> queryIDToText = 
+              relevanceToDocumentMap.get(doc.getRelevanceValue());
       if (queryIDToText.containsKey(doc.getQueryId()))
       {
         queryIDToText.get(doc.getQueryId()).add(doc.getText());
@@ -161,7 +193,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
     }
     else
     {
-      HashMap<Integer, HashSet<String>> queryIDToText = new HashMap<Integer, HashSet<String>>();
+      HashMap<Integer, HashSet<String>> queryIDToText = 
+              new HashMap<Integer, HashSet<String>>();
       HashSet<String> set = new HashSet<String>();
      
       set.add(doc.getText());
@@ -197,23 +230,59 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
   private void computeDiceCoefficient() 
   {
     System.out.println("Using Dice Coefficient:");
-    HashMap<Integer, HashSet<String>> queryMap = relevanceToDocumentMap.get(QUERY_TYPE);
+    
+    Set<String> documentTexts = textToBigramMap.keySet();
+    HashMap<Integer, HashMap<Collection<String>, Collection<String>>> queryIdToQuestionBigramToCorrectAnswerMap
+     = new HashMap<Integer, HashMap<Collection<String>, Collection<String>>>();
+    HashMap<Integer, HashMap<Collection<String>, Collection<String>>> queryIdToQuestionBigramToWrongAnswerMap
+    = new HashMap<Integer, HashMap<Collection<String>, Collection<String>>>();
+    
+    for (String doc: documentTexts)
+    {      
+      Collection<String> bigrams = textToBigramMap.get(doc);
+      if (sentenceToRelevanceMap.get(doc) == QUERY_TYPE)
+      {
+        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
+                new HashMap<Collection<String>, Collection<String>>();
+        queryBigramsToAnswerBigramsMap.put(bigrams, new HashSet<String>());
         
-    HashMap<String, HashSet<String>> queryBigrams = new HashMap<String, HashSet<String>>();
-    HashMap<String, HashSet<String>> correctBigrams = new HashMap<String, HashSet<String>>();
-    HashMap<String, HashSet<String>> incorrectBigrams = new HashMap<String, HashSet<String>>();
-
-    Set<Integer> queryQueryIDs = queryMap.keySet();
-    for (Integer queryQueryID : queryQueryIDs)
-    {
-      Iterator<String> iter = queryMap.get(queryQueryID).iterator();
-      String query = iter.next();
-      Map<String, Integer> queryVector = globalWordDictionary.get(query);
-      
-      
-      
-      System.out.println(queryVector);
+        queryIdToQuestionBigramToCorrectAnswerMap.put(sentenceToQueryIDMap.get(doc), 
+                queryBigramsToAnswerBigramsMap);
+        queryIdToQuestionBigramToWrongAnswerMap.put(sentenceToQueryIDMap.get(doc), 
+                queryBigramsToAnswerBigramsMap);
+      }
     }
+    
+    for (String doc: documentTexts)
+    {
+      Collection<String> answerBigrams = textToBigramMap.get(doc);
+
+      if (sentenceToRelevanceMap.get(doc) == INCORRECT_TYPE)
+      {
+        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
+                queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc));
+        Collection<Collection<String>> queryBigramList = 
+                queryBigramsToAnswerBigramsMap.keySet();
+        for (Collection<String> queryBigrams : queryBigramList)
+        {
+          queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc)).
+            put(queryBigrams, answerBigrams);
+        }        
+      }
+      else if (sentenceToRelevanceMap.get(doc) == CORRECT_TYPE)
+      {
+        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
+                queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc));
+        Collection<Collection<String>> queryBigramList = queryBigramsToAnswerBigramsMap.keySet();
+        for (Collection<String> queryBigrams : queryBigramList)
+        {
+          queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc)).
+            put(queryBigrams, answerBigrams);
+        }        
+      }
+    }    
+    
+    System.out.println(queryIdToQuestionBigramToWrongAnswerMap);
   }
 	
 	/**
@@ -312,7 +381,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
         boolean added = false;
         for (int i = 0; i < rankedAnswers.size(); i++)
         {
-          if (cosineSimilarities.get(nextUnprocessed) > cosineSimilarities.get(rankedAnswers.get(i)))
+          if (cosineSimilarities.get(nextUnprocessed) > 
+                cosineSimilarities.get(rankedAnswers.get(i)))
           {
             rankedAnswers.add(i, nextUnprocessed);
             added = true;

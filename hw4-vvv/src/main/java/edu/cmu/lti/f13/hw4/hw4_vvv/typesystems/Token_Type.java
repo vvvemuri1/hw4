@@ -13,7 +13,7 @@ import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
 
 /** 
- * Updated by JCasGen Wed Oct 30 12:49:36 EDT 2013
+ * Updated by JCasGen Wed Oct 30 14:17:08 EDT 2013
  * @generated */
 public class Token_Type extends BaseAnnotation_Type {
   /** @generated */

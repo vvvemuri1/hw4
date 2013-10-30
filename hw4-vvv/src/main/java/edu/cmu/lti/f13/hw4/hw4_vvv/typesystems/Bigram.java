@@ -10,7 +10,7 @@ import org.apache.uima.jcas.cas.TOP_Type;
 
 
 /** A bigram type containing two consecutive tokens
- * Updated by JCasGen Wed Oct 30 12:49:36 EDT 2013
+ * Updated by JCasGen Wed Oct 30 14:17:08 EDT 2013
  * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
 public class Bigram extends BaseAnnotation {
