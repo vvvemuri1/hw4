@@ -2,11 +2,13 @@ package edu.cmu.lti.f13.hw4.hw4_vvv.casconsumers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIterator;
@@ -16,6 +18,8 @@ import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
+
+import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
 import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
@@ -39,15 +43,20 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	private HashMap<String, HashMap<String, Integer>> globalWordDictionary;
 
 	/**
-	 * Map of sentence to map of relevance values to Documents.
+	 * Hash Map of sentence to map of relevance values to Documents.
 	 */
 	private HashMap<Integer, HashMap<Integer, HashSet<String>>> relevanceToDocumentMap;
 	
 	/**
-	 * Map of sentence to rank
+	 * Hash Map of sentence to rank
 	 */
-  HashMap<String, Integer> sentenceToRankMap;
-	
+  private HashMap<String, Integer> sentenceToRankMap;
+  	
+  /**
+   * Hash Map of sentence to collection of Bigrams
+   */
+  private HashMap<String, Collection<Bigram>> sentenceToBigramMap;
+  
 	/**
 	 * Initializes the list of query IDS, the list of relevance values and the
 	 * Global word dictionary.
@@ -72,7 +81,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	 */
 	@Override
 	public void processCas(CAS aCas) throws ResourceProcessException 
-	{
+	{	  
 		JCas jcas;
 		try 
 		{
@@ -94,6 +103,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 			
 			qIdList.add(doc.getQueryId());
 			relList.add(doc.getRelevanceValue());
+			
+			// Add list of Bigrams corresponding to sentence to sentenceToBigramMap
+			sentenceToBigramMap.put(doc.getText(), Utils.fromFSListToCollection(doc.getBigramList(), Bigram.class));
 			
 			// Populate the global word dictionary			
 	    populateGlobalDictionary(fsTokenList, doc.getText());
@@ -186,7 +198,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
   {
     System.out.println("Using Dice Coefficient:");
     HashMap<Integer, HashSet<String>> queryMap = relevanceToDocumentMap.get(QUERY_TYPE);
-    
+        
     HashMap<String, HashSet<String>> queryBigrams = new HashMap<String, HashSet<String>>();
     HashMap<String, HashSet<String>> correctBigrams = new HashMap<String, HashSet<String>>();
     HashMap<String, HashSet<String>> incorrectBigrams = new HashMap<String, HashSet<String>>();
@@ -199,6 +211,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
       Map<String, Integer> queryVector = globalWordDictionary.get(query);
       
       
+      
+      System.out.println(queryVector);
     }
   }
 	

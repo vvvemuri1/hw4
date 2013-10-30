@@ -9,7 +9,7 @@ import org.apache.uima.jcas.cas.TOP_Type;
 import org.apache.uima.jcas.cas.FSList;
 
 /** 
- * Updated by JCasGen Wed Oct 23 00:34:44 EDT 2013
+ * Updated by JCasGen Wed Oct 30 12:49:36 EDT 2013
  * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
 public class Document extends BaseAnnotation {
@@ -130,6 +130,24 @@ public class Document extends BaseAnnotation {
     if (Document_Type.featOkTst && ((Document_Type)jcasType).casFeat_queryId == null)
       jcasType.jcas.throwFeatMissing("queryId", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
     jcasType.ll_cas.ll_setIntValue(addr, ((Document_Type)jcasType).casFeatCode_queryId, v);}    
+   
+    
+  //*--------------*
+  //* Feature: bigramList
+
+  /** getter for bigramList - gets 
+   * @generated */
+  public FSList getBigramList() {
+    if (Document_Type.featOkTst && ((Document_Type)jcasType).casFeat_bigramList == null)
+      jcasType.jcas.throwFeatMissing("bigramList", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    return (FSList)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Document_Type)jcasType).casFeatCode_bigramList)));}
+    
+  /** setter for bigramList - sets  
+   * @generated */
+  public void setBigramList(FSList v) {
+    if (Document_Type.featOkTst && ((Document_Type)jcasType).casFeat_bigramList == null)
+      jcasType.jcas.throwFeatMissing("bigramList", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    jcasType.ll_cas.ll_setRefValue(addr, ((Document_Type)jcasType).casFeatCode_bigramList, jcasType.ll_cas.ll_getFSRef(v));}    
   }
 
     

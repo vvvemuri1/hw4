@@ -4,12 +4,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.tcas.Annotation;
+
+import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
 import edu.cmu.lti.f13.hw4.hw4_vvv.utils.Utils;
@@ -28,15 +31,45 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
    * @return void
    */
 	@Override
-	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+	public void process(JCas jcas) throws AnalysisEngineProcessException 
+	{
 		FSIterator<Annotation> iter = jcas.getAnnotationIndex().iterator();
 		if (iter.isValid()) 
 		{
 			iter.moveToNext();
 			Document doc = (Document) iter.get();
 			createTermFreqVector(jcas, doc);
+			createBigramsList(jcas, doc);
 		}
+	}
+	
+	/**
+	 * Constructs a list of bigrams from the document text.
+	 * @param jcas JCas object that provides access to the CAS.
+	 * @param doc Document from which we wish to get a list of
+	 *            bigrams.
+	 * @return void
+	 */
+	private void createBigramsList(JCas jcas, Document doc)
+	{
+	   FSList list = doc.getTokenList();
+	   Collection<Token> tokenList = Utils.fromFSListToCollection(list, Token.class);
+     Collection<Bigram> bigramList = new LinkedList<Bigram>();
+
+     Token prevToken = null;
+	   for (Token token : tokenList)
+	   {
+	     if (prevToken != null)
+	     {
+	       Bigram bigram = new Bigram(jcas);
+	       bigram.setFirstToken(prevToken);
+	       bigram.setSecondToken(token);
+	       bigramList.add(bigram);
+	     }
+	   }
+	   
+	   FSList bigrams = Utils.fromCollectionToFSList(jcas, bigramList);
+	   doc.setBigramList(bigrams);
 	}
 	
 	/**
@@ -58,6 +91,8 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 		while (st.hasMoreTokens())
 		{
 		  String tokenText = st.nextToken();
+		  tokenText = tokenText.toUpperCase();
+		  
 		  Token token = new Token(jcas);
 		  token.setText(tokenText);
 		  

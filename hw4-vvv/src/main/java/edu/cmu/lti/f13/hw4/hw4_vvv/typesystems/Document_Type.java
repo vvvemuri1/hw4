@@ -13,7 +13,7 @@ import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
 
 /** 
- * Updated by JCasGen Wed Oct 23 00:34:44 EDT 2013
+ * Updated by JCasGen Wed Oct 30 12:49:36 EDT 2013
  * @generated */
 public class Document_Type extends BaseAnnotation_Type {
   /** @generated */
@@ -114,6 +114,24 @@ public class Document_Type extends BaseAnnotation_Type {
     ll_cas.ll_setIntValue(addr, casFeatCode_queryId, v);}
     
   
+ 
+  /** @generated */
+  final Feature casFeat_bigramList;
+  /** @generated */
+  final int     casFeatCode_bigramList;
+  /** @generated */ 
+  public int getBigramList(int addr) {
+        if (featOkTst && casFeat_bigramList == null)
+      jcas.throwFeatMissing("bigramList", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    return ll_cas.ll_getRefValue(addr, casFeatCode_bigramList);
+  }
+  /** @generated */    
+  public void setBigramList(int addr, int v) {
+        if (featOkTst && casFeat_bigramList == null)
+      jcas.throwFeatMissing("bigramList", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document");
+    ll_cas.ll_setRefValue(addr, casFeatCode_bigramList, v);}
+    
+  
 
 
 
@@ -138,6 +156,10 @@ public class Document_Type extends BaseAnnotation_Type {
  
     casFeat_queryId = jcas.getRequiredFeatureDE(casType, "queryId", "uima.cas.Integer", featOkTst);
     casFeatCode_queryId  = (null == casFeat_queryId) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_queryId).getCode();
+
+ 
+    casFeat_bigramList = jcas.getRequiredFeatureDE(casType, "bigramList", "uima.cas.FSList", featOkTst);
+    casFeatCode_bigramList  = (null == casFeat_bigramList) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_bigramList).getCode();
 
   }
 }
