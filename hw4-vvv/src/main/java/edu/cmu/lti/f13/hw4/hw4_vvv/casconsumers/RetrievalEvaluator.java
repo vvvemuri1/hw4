@@ -383,9 +383,10 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		double numerator = 0;
 		Set<String> sentences = sentenceToRankMap.keySet();
 		
+		
 		for (String sentence : sentences)
 		{
-		  numerator += sentenceToRankMap.get(sentence);
+		  numerator += (1f/(sentenceToRankMap.get(sentence)));
 		}
 		
 		metric_mrr = numerator/numQueries;
