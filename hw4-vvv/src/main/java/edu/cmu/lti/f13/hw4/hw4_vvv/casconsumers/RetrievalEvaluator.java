@@ -173,6 +173,41 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		super.collectionProcessComplete(trace);
 
 		// Compute cosine similarity
+		computeCosineSimilarity();
+		
+		// Compute Dice Coefficient
+		computeDiceCoefficient();
+	}
+
+	/**
+	 * Helper function that computes the dice coefficient and outputs the MRR value.
+	 */
+  private void computeDiceCoefficient() 
+  {
+    System.out.println("Using Dice Coefficient:");
+    HashMap<Integer, HashSet<String>> queryMap = relevanceToDocumentMap.get(QUERY_TYPE);
+    
+    HashMap<String, HashSet<String>> queryBigrams = new HashMap<String, HashSet<String>>();
+    HashMap<String, HashSet<String>> correctBigrams = new HashMap<String, HashSet<String>>();
+    HashMap<String, HashSet<String>> incorrectBigrams = new HashMap<String, HashSet<String>>();
+
+    Set<Integer> queryQueryIDs = queryMap.keySet();
+    for (Integer queryQueryID : queryQueryIDs)
+    {
+      Iterator<String> iter = queryMap.get(queryQueryID).iterator();
+      String query = iter.next();
+      Map<String, Integer> queryVector = globalWordDictionary.get(query);
+      
+      
+    }
+  }
+	
+	/**
+	 * Helper function that computes the cosine similarity and outputs the MRR value.
+	 */
+  private void computeCosineSimilarity() 
+  {
+    System.out.println("Using Cosine Similarity:");
 		HashMap<String, Double> cosineSimilarities = new HashMap<String, Double>();
 		HashMap<Integer, HashSet<String>> queryMap = relevanceToDocumentMap.get(QUERY_TYPE);
 		
@@ -217,7 +252,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		// Compute the mean reciprocal rank
 		double metric_mrr = compute_mrr(queryQueryIDs.size());
 		System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
-	}
+		System.out.println();
+  }
 
 	/**
 	 * Helper function that ranks all the answers using their cosine scores and populates
