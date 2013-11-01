@@ -121,16 +121,15 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 			Collection<Bigram> bigrams = Utils.fromFSListToCollection(doc.getBigramList(), Bigram.class);
 			
 			// Add to textToBigramMap and sentenceToQueryIDMap
-			String bigramStrings = "";
 			HashSet<String> bigramStringCollection = new HashSet<String>();
 			
 			for (Bigram bigram : bigrams)
 			{
+		    String bigramStrings = "";
 			  bigramStrings = bigram.getFirstToken().getText();
 			  bigramStrings += (bigram.getSecondToken().getText());
+		    bigramStringCollection.add(bigramStrings);
 			}
-			
-			bigramStringCollection.add(bigramStrings);
 			
 			textToBigramMap.put(doc.getText(), bigramStringCollection);
 			sentenceToQueryIDMap.put(doc.getText(), doc.getQueryId());
@@ -244,7 +243,65 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
       {
         HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
                 new HashMap<Collection<String>, Collection<String>>();
+                
         queryBigramsToAnswerBigramsMap.put(bigrams, new HashSet<String>());
+        
+        queryIdToQuestionBigramToCorrectAnswerMap.put(sentenceToQueryIDMap.get(doc), 
+                queryBigramsToAnswerBigramsMap);
+        queryIdToQuestionBigramToWrongAnswerMap.put(sentenceToQueryIDMap.get(doc), 
+                queryBigramsToAnswerBigramsMap);
+      }
+    }
+    
+    for (String doc: documentTexts)
+    {      
+      Collection<String> bigrams = textToBigramMap.get(doc);
+      //System.out.println(doc + " " + sentenceToRelevanceMap.get(doc));
+      if (sentenceToRelevanceMap.get(doc) == INCORRECT_TYPE)
+      {
+        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
+                queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc));
+        Collection<Collection<String>> queryBigramList = 
+                queryBigramsToAnswerBigramsMap.keySet();
+        for (Collection<String> queryBigrams : queryBigramList)
+        {
+          System.out.println(bigrams);
+          queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc)).
+            put(queryBigrams, bigrams);
+          System.out.println(queryIdToQuestionBigramToWrongAnswerMap);
+        }        
+      }
+      else if (sentenceToRelevanceMap.get(doc) == CORRECT_TYPE)
+      {
+        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
+                queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc));
+        Collection<Collection<String>> queryBigramList = queryBigramsToAnswerBigramsMap.keySet();
+        for (Collection<String> queryBigrams : queryBigramList)
+        {
+          queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc)).
+            put(queryBigrams, bigrams);
+        }        
+      }
+    }
+    
+    //System.out.println(queryIdToQuestionBigramToWrongAnswerMap);
+    //System.out.println(queryIdToQuestionBigramToCorrectAnswerMap);
+  }
+  
+      /*if (sentenceToRelevanceMap.get(doc) == QUERY_TYPE)
+      {
+        HashMap<String, String> queryBigramsToAnswerBigramsMap;
+        
+        if (queryIdToQuestionBigramToCorrectAnswerMap.containsKey(sentenceToRelevanceMap.get(doc)))
+        {
+          queryBigramsToAnswerBigramsMap = queryIdToQuestionBigramToCorrectAnswerMap.get(bigrams);
+          queryBigramsToAnswerBigramsMap.
+        }
+        else
+        {
+          queryBigramsToAnswerBigramsMap = new HashMap<String, String>();
+          queryBigramsToAnswerBigramsMap.put(bigrams, null);
+        }
         
         queryIdToQuestionBigramToCorrectAnswerMap.put(sentenceToQueryIDMap.get(doc), 
                 queryBigramsToAnswerBigramsMap);
@@ -282,8 +339,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
       }
     }    
     
-    System.out.println(queryIdToQuestionBigramToWrongAnswerMap);
-  }
+    System.out.println(queryIdToQuestionBigramToWrongAnswerMap);*/
+  //}
 	
 	/**
 	 * Helper function that computes the cosine similarity and outputs the MRR value.
