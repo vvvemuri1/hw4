@@ -76,6 +76,11 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
    */
   private HashMap<String, Collection<Integer>> sentenceToQueryIDMap;
 
+  /**
+   * Hash Map of Query ID to Correct Answer to Rank of correct answer
+   */
+  HashMap<Integer, HashMap<String, Integer>> queryIdToCorrectAnswerToRankMap;
+  
 	/**
 	 * Initializes the list of query IDS, the list of relevance values and the
 	 * Global word dictionary.
@@ -92,6 +97,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		sentenceToRelevanceMap = new HashMap<String, Integer> ();
 		sentenceToQueryIDMap = new HashMap<String, Collection<Integer>> ();
 		bigramtoTextMap = new HashMap<Collection<String>, String>();
+		queryIdToCorrectAnswerToRankMap = new HashMap<Integer, HashMap<String, Integer>>();
 	}
 
 	/**
@@ -269,19 +275,13 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
                      queryIdToQuestionBigramToWrongAnswerMap, 
                      queryIdToCorrectAnswerToScoreMap,
                      queryIdToWrongAnswerToScoreMap);
-            
-    HashMap<Integer, HashMap<String, Integer>> queryIdToCorrectAnswerToRankMap
-        = new HashMap<Integer, HashMap<String, Integer>>();
-    
+                
     rankAnswersUsingDiceScore(queryIdToQuestionBigramToCorrectAnswerMap,
             queryIdToCorrectAnswerToScoreMap, queryIdToWrongAnswerToScoreMap,
             queryIdToCorrectAnswerToRankMap);
         
     Collection<Integer> queryIDs = queryIdToCorrectAnswerToRankMap.keySet();
-    
-    System.out.println(queryIdToCorrectAnswerToScoreMap);
-    System.out.println(queryIdToWrongAnswerToScoreMap);
-    
+        
     for (Integer queryID : queryIDs)
     {
       Collection<String> correctAnswers = queryIdToCorrectAnswerToScoreMap.get(queryID).keySet();
@@ -293,6 +293,11 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
         System.out.println();
       }
     }
+    
+    // Compute the mean reciprocal rank
+    double metric_mrr = compute_mrr_dice(queryIDs.size());
+    System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
+    System.out.println();
   }
 
   /**
@@ -606,7 +611,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
     }
     
 		// Compute the mean reciprocal rank
-		double metric_mrr = compute_mrr(queryQueryIDs.size());
+		double metric_mrr = compute_mrr_cosine(queryQueryIDs.size());
 		System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
 		System.out.println();
   }
@@ -766,11 +771,12 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 	}
 
 	/**
-	 * Calculates the mean reciprocal rank for all sentences.
+	 * Calculates the mean reciprocal rank for all sentences when the
+	 * cosine similarity metric is used.
 	 * @param numQueries Total number of queries.
 	 * @return mrr Calculated Mean Reciprocal Rank value.
 	 */
-	private double compute_mrr(int numQueries) 
+	private double compute_mrr_cosine(int numQueries) 
 	{
 		double metric_mrr = 0.0;
 		double numerator = 0;
@@ -787,4 +793,30 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		return metric_mrr;
 	}
 
+	 /**
+   * Calculates the mean reciprocal rank for all sentences when the
+   * dice coefficient metric is used.
+   * @param numQueries Total number of queries.
+   * @return mrr Calculated Mean Reciprocal Rank value.
+   */
+  private double compute_mrr_dice(int numQueries) 
+  {
+    double metric_mrr = 0.0;
+    double numerator = 0;
+    
+    Collection<Integer> queryIDs = queryIdToCorrectAnswerToRankMap.keySet();
+    for (Integer queryID: queryIDs)
+    {
+      HashMap<String, Integer> correctAnswerToRankMap = queryIdToCorrectAnswerToRankMap.get(queryID);
+      Collection<String> correctAnswers = correctAnswerToRankMap.keySet();
+      for (String correctAnswer : correctAnswers)
+      {
+        numerator += (1f/(queryIdToCorrectAnswerToRankMap.get(queryID).get(correctAnswer)));
+      }
+    }
+        
+    metric_mrr = numerator/numQueries;
+    
+    return metric_mrr;
+  }
 }

@@ -53,7 +53,13 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	private void createBigramsList(JCas jcas, Document doc)
 	{
     Collection<Bigram> bigramList = new LinkedList<Bigram>();
-    StringTokenizer st = new StringTokenizer(doc.getText());
+    
+    String strippedInput = doc.getText().replaceAll(",", "");
+    strippedInput = strippedInput.replaceAll("'", "");
+    strippedInput = strippedInput.replaceAll(";", "");
+    strippedInput = strippedInput.replaceAll("\\.", "");
+    
+    StringTokenizer st = new StringTokenizer(strippedInput);
     
     String prevToken = null;
     while (st.hasMoreTokens())
