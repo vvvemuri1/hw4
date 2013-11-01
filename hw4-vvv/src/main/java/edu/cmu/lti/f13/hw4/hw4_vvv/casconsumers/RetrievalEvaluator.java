@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIterator;
@@ -22,7 +21,6 @@ import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
-
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Document;
 import edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token;
