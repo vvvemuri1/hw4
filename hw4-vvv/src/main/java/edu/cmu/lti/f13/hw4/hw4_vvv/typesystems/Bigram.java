@@ -10,7 +10,7 @@ import org.apache.uima.jcas.cas.TOP_Type;
 
 
 /** A bigram type containing two consecutive tokens
- * Updated by JCasGen Wed Oct 30 14:17:08 EDT 2013
+ * Updated by JCasGen Thu Oct 31 23:25:49 EDT 2013
  * XML source: /Users/vvvemuri1/git/hw4/hw4-vvv/src/main/resources/descriptors/typesystems/VectorSpaceTypes.xml
  * @generated */
 public class Bigram extends BaseAnnotation {
@@ -66,17 +66,17 @@ public class Bigram extends BaseAnnotation {
 
   /** getter for firstToken - gets First token of the bigram
    * @generated */
-  public Token getFirstToken() {
+  public String getFirstToken() {
     if (Bigram_Type.featOkTst && ((Bigram_Type)jcasType).casFeat_firstToken == null)
       jcasType.jcas.throwFeatMissing("firstToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    return (Token)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Bigram_Type)jcasType).casFeatCode_firstToken)));}
+    return jcasType.ll_cas.ll_getStringValue(addr, ((Bigram_Type)jcasType).casFeatCode_firstToken);}
     
   /** setter for firstToken - sets First token of the bigram 
    * @generated */
-  public void setFirstToken(Token v) {
+  public void setFirstToken(String v) {
     if (Bigram_Type.featOkTst && ((Bigram_Type)jcasType).casFeat_firstToken == null)
       jcasType.jcas.throwFeatMissing("firstToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    jcasType.ll_cas.ll_setRefValue(addr, ((Bigram_Type)jcasType).casFeatCode_firstToken, jcasType.ll_cas.ll_getFSRef(v));}    
+    jcasType.ll_cas.ll_setStringValue(addr, ((Bigram_Type)jcasType).casFeatCode_firstToken, v);}    
    
     
   //*--------------*
@@ -84,17 +84,17 @@ public class Bigram extends BaseAnnotation {
 
   /** getter for secondToken - gets The second token of the bigram
    * @generated */
-  public Token getSecondToken() {
+  public String getSecondToken() {
     if (Bigram_Type.featOkTst && ((Bigram_Type)jcasType).casFeat_secondToken == null)
       jcasType.jcas.throwFeatMissing("secondToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    return (Token)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Bigram_Type)jcasType).casFeatCode_secondToken)));}
+    return jcasType.ll_cas.ll_getStringValue(addr, ((Bigram_Type)jcasType).casFeatCode_secondToken);}
     
   /** setter for secondToken - sets The second token of the bigram 
    * @generated */
-  public void setSecondToken(Token v) {
+  public void setSecondToken(String v) {
     if (Bigram_Type.featOkTst && ((Bigram_Type)jcasType).casFeat_secondToken == null)
       jcasType.jcas.throwFeatMissing("secondToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    jcasType.ll_cas.ll_setRefValue(addr, ((Bigram_Type)jcasType).casFeatCode_secondToken, jcasType.ll_cas.ll_getFSRef(v));}    
+    jcasType.ll_cas.ll_setStringValue(addr, ((Bigram_Type)jcasType).casFeatCode_secondToken, v);}    
   }
 
     

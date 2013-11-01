@@ -52,26 +52,25 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	 */
 	private void createBigramsList(JCas jcas, Document doc)
 	{
-	   FSList list = doc.getTokenList();
-	   Collection<Token> tokenList = Utils.fromFSListToCollection(list, Token.class);
-     Collection<Bigram> bigramList = new LinkedList<Bigram>();
-
-     Token prevToken = null;
-	   for (Token token : tokenList)
-	   {
-	     if (prevToken != null)
-	     {
-	       Bigram bigram = new Bigram(jcas);
-	       bigram.setFirstToken(prevToken);
-	       bigram.setSecondToken(token);
-	       bigramList.add(bigram);
-	     }
-	     
-       prevToken = token;
-	   }
-	   	   
-	   FSList bigrams = Utils.fromCollectionToFSList(jcas, bigramList);
-	   doc.setBigramList(bigrams);
+    Collection<Bigram> bigramList = new LinkedList<Bigram>();
+    StringTokenizer st = new StringTokenizer(doc.getText());
+    
+    String prevToken = null;
+    while (st.hasMoreTokens())
+    {
+      if (prevToken != null)
+      {
+        String token = st.nextToken();
+        Bigram bigram = new Bigram(jcas);
+        bigram.setFirstToken(prevToken);
+        bigram.setSecondToken(token);
+        bigramList.add(bigram);
+        prevToken = token;
+      }      
+    }
+           	   
+    FSList bigrams = Utils.fromCollectionToFSList(jcas, bigramList);
+    doc.setBigramList(bigrams);
 	}
 	
 	/**

@@ -87,12 +87,12 @@
         <featureDescription>
           <name>firstToken</name>
           <description>First token of the bigram</description>
-          <rangeTypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token</rangeTypeName>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
         </featureDescription>
         <featureDescription>
           <name>secondToken</name>
           <description>The second token of the bigram</description>
-          <rangeTypeName>edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token</rangeTypeName>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
         </featureDescription>
       </features>
     </typeDescription>

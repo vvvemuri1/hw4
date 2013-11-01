@@ -13,7 +13,7 @@ import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
 
 /** A bigram type containing two consecutive tokens
- * Updated by JCasGen Wed Oct 30 14:17:08 EDT 2013
+ * Updated by JCasGen Thu Oct 31 23:25:49 EDT 2013
  * @generated */
 public class Bigram_Type extends BaseAnnotation_Type {
   /** @generated */
@@ -48,16 +48,16 @@ public class Bigram_Type extends BaseAnnotation_Type {
   /** @generated */
   final int     casFeatCode_firstToken;
   /** @generated */ 
-  public int getFirstToken(int addr) {
+  public String getFirstToken(int addr) {
         if (featOkTst && casFeat_firstToken == null)
       jcas.throwFeatMissing("firstToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    return ll_cas.ll_getRefValue(addr, casFeatCode_firstToken);
+    return ll_cas.ll_getStringValue(addr, casFeatCode_firstToken);
   }
   /** @generated */    
-  public void setFirstToken(int addr, int v) {
+  public void setFirstToken(int addr, String v) {
         if (featOkTst && casFeat_firstToken == null)
       jcas.throwFeatMissing("firstToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    ll_cas.ll_setRefValue(addr, casFeatCode_firstToken, v);}
+    ll_cas.ll_setStringValue(addr, casFeatCode_firstToken, v);}
     
   
  
@@ -66,16 +66,16 @@ public class Bigram_Type extends BaseAnnotation_Type {
   /** @generated */
   final int     casFeatCode_secondToken;
   /** @generated */ 
-  public int getSecondToken(int addr) {
+  public String getSecondToken(int addr) {
         if (featOkTst && casFeat_secondToken == null)
       jcas.throwFeatMissing("secondToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    return ll_cas.ll_getRefValue(addr, casFeatCode_secondToken);
+    return ll_cas.ll_getStringValue(addr, casFeatCode_secondToken);
   }
   /** @generated */    
-  public void setSecondToken(int addr, int v) {
+  public void setSecondToken(int addr, String v) {
         if (featOkTst && casFeat_secondToken == null)
       jcas.throwFeatMissing("secondToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Bigram");
-    ll_cas.ll_setRefValue(addr, casFeatCode_secondToken, v);}
+    ll_cas.ll_setStringValue(addr, casFeatCode_secondToken, v);}
     
   
 
@@ -88,11 +88,11 @@ public class Bigram_Type extends BaseAnnotation_Type {
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
  
-    casFeat_firstToken = jcas.getRequiredFeatureDE(casType, "firstToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token", featOkTst);
+    casFeat_firstToken = jcas.getRequiredFeatureDE(casType, "firstToken", "uima.cas.String", featOkTst);
     casFeatCode_firstToken  = (null == casFeat_firstToken) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_firstToken).getCode();
 
  
-    casFeat_secondToken = jcas.getRequiredFeatureDE(casType, "secondToken", "edu.cmu.lti.f13.hw4.hw4_vvv.typesystems.Token", featOkTst);
+    casFeat_secondToken = jcas.getRequiredFeatureDE(casType, "secondToken", "uima.cas.String", featOkTst);
     casFeatCode_secondToken  = (null == casFeat_secondToken) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_secondToken).getCode();
 
   }
