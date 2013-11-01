@@ -105,4 +105,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	<scm>
+		<connection>scm:git:https://github.com/vvvemuri1/hw4.git</connection>
+		<developerConnection>scm:git:https://github.com/vvvemuri1/hw4.git</developerConnection>
+	</scm>
 </project>
