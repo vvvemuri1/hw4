@@ -58,15 +58,17 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     String prevToken = null;
     while (st.hasMoreTokens())
     {
+      String token = st.nextToken();
+      
       if (prevToken != null)
       {
-        String token = st.nextToken();
         Bigram bigram = new Bigram(jcas);
-        bigram.setFirstToken(prevToken);
-        bigram.setSecondToken(token);
+        bigram.setFirstToken(prevToken.toUpperCase());
+        bigram.setSecondToken(token.toUpperCase());
         bigramList.add(bigram);
-        prevToken = token;
       }      
+      
+      prevToken = token;
     }
            	   
     FSList bigrams = Utils.fromCollectionToFSList(jcas, bigramList);

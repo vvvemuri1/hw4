@@ -3,9 +3,13 @@ package edu.cmu.lti.f13.hw4.hw4_vvv.casconsumers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,6 +62,11 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
   private HashMap<String, Collection<String>> textToBigramMap;
   
   /**
+   * Hash Map of collection of bigrams to sentence
+   */
+  private HashMap<Collection<String>, String> bigramtoTextMap;
+  
+  /**
    * Hash Map of sentence to relevance value
    */
   private HashMap<String, Integer> sentenceToRelevanceMap;
@@ -82,6 +91,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 		textToBigramMap = new HashMap<String, Collection<String>>();
 		sentenceToRelevanceMap = new HashMap<String, Integer> ();
 		sentenceToQueryIDMap = new HashMap<String, Integer> ();
+		bigramtoTextMap = new HashMap<Collection<String>, String>();
 	}
 
 	/**
@@ -132,6 +142,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 			}
 			
 			textToBigramMap.put(doc.getText(), bigramStringCollection);
+			bigramtoTextMap.put(bigramStringCollection, doc.getText());
 			sentenceToQueryIDMap.put(doc.getText(), doc.getQueryId());
 			
 			// Add Sentence and relevance value to sentenceToRelevanceMap
@@ -231,25 +242,181 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
     System.out.println("Using Dice Coefficient:");
     
     Set<String> documentTexts = textToBigramMap.keySet();
-    HashMap<Integer, HashMap<Collection<String>, Collection<String>>> queryIdToQuestionBigramToCorrectAnswerMap
-     = new HashMap<Integer, HashMap<Collection<String>, Collection<String>>>();
-    HashMap<Integer, HashMap<Collection<String>, Collection<String>>> queryIdToQuestionBigramToWrongAnswerMap
-    = new HashMap<Integer, HashMap<Collection<String>, Collection<String>>>();
+    HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>> queryIdToQuestionBigramToCorrectAnswerMap
+        = new HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>>();
+    HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>> queryIdToQuestionBigramToWrongAnswerMap
+        = new HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>>();
     
+    populateQuestionBigramToAnswerMaps(documentTexts, queryIdToQuestionBigramToCorrectAnswerMap,
+            queryIdToQuestionBigramToWrongAnswerMap);
+
+    HashMap<Integer, HashMap<String, Double>> queryIdToCorrectAnswerToScoreMap
+        = new HashMap<Integer, HashMap<String, Double>>();
+    HashMap<Integer, HashMap<String, Double>> queryIdToWrongAnswerToScoreMap
+        = new HashMap<Integer, HashMap<String, Double>>();
+
+    computeDiceScore(queryIdToQuestionBigramToCorrectAnswerMap,
+                     queryIdToQuestionBigramToWrongAnswerMap, 
+                     queryIdToCorrectAnswerToScoreMap,
+                     queryIdToWrongAnswerToScoreMap);
+        
+    HashMap<Integer, HashMap<String, Double>> queryIdToCorrectAnswerToRankMap
+        = new HashMap<Integer, HashMap<String, Double>>();
+    
+    Set<Integer> queryIDs = queryIdToQuestionBigramToCorrectAnswerMap.keySet();
+    
+    for (Integer queryID : queryIDs)
+    {
+      HashMap<String, Double> correctAnswerToScoreMap = queryIdToCorrectAnswerToScoreMap.get(queryID);
+      HashMap<String, Double> wrongAnswerToScoreMap = queryIdToCorrectAnswerToScoreMap.get(queryID);
+      
+      Set<String> wrongAnswers = wrongAnswerToScoreMap.keySet();
+      Set<String> answers = correctAnswerToScoreMap.keySet();
+      answers.addAll(wrongAnswers);
+      
+      List<String> answerList = new LinkedList<String>(answers);
+      
+      Collections.sort(answerList, 
+              new Comparator<String>()
+              {
+                @Override
+                public int compare(String answer1, String answer2) 
+                {
+                  int score1;
+                  
+                  
+                  return 0;
+                }               
+              }
+      );
+    }
+              
+    System.out.println(queryIdToCorrectAnswerToScoreMap);
+  }
+
+  /**
+   * Computes the Dice coefficient for all the answers.
+   * @param queryIdToQuestionBigramToCorrectAnswerMap Map of Query ID to Question Bigram to Correct Answer
+   * @param queryIdToQuestionBigramToWrongAnswerMap Map of Query ID to Question Bigram to Wrong Answer
+   * @param queryIdToCorrectAnswerToScoreMap Map of Query ID to Correct Answer to Score 
+   * @param queryIdToWrongAnswerToScoreMap Map of Query ID to Wrong Answer to Score
+   */
+  private void computeDiceScore(
+      HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>> queryIdToQuestionBigramToCorrectAnswerMap,
+      HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>> queryIdToQuestionBigramToWrongAnswerMap,
+      HashMap<Integer, HashMap<String, Double>> queryIdToCorrectAnswerToScoreMap,
+      HashMap<Integer, HashMap<String, Double>> queryIdToWrongAnswerToScoreMap) 
+  {
+    Set<Integer> queryIDs = queryIdToQuestionBigramToCorrectAnswerMap.keySet();
+    for (Integer queryID : queryIDs)
+    {
+      HashMap<Collection<String>, Collection<Collection<String>>> questionBigramsToCorrectAnswerBigrams = 
+              queryIdToQuestionBigramToCorrectAnswerMap.get(queryID);
+      Collection<Collection<String>> questionBigramCollections = questionBigramsToCorrectAnswerBigrams.keySet();
+      
+      for (Collection<String> questionBigrams : questionBigramCollections)
+      {
+        Collection<Collection<String>> correctAnswerBigramCollections = 
+                questionBigramsToCorrectAnswerBigrams.get(questionBigrams);
+        for (Collection<String> correctAnswerBigrams : correctAnswerBigramCollections)
+        {
+          HashSet<String> qBigrams = new HashSet<String>(questionBigrams);
+          HashSet<String> aBigrams = new HashSet<String>(correctAnswerBigrams);
+
+          aBigrams.retainAll(qBigrams);
+          double score = 2 * ((aBigrams.size())/(questionBigrams.size() + correctAnswerBigrams.size()));
+          String answer = bigramtoTextMap.get(correctAnswerBigrams);
+          
+          HashMap<String, Double> correctAnswerToScoreMap;
+          
+          if (queryIdToCorrectAnswerToScoreMap.containsKey(queryID))
+          {
+            correctAnswerToScoreMap = queryIdToCorrectAnswerToScoreMap.get(queryID);
+          }
+          else
+          {
+            correctAnswerToScoreMap = new HashMap<String, Double>();
+          }          
+          
+          correctAnswerToScoreMap.put(answer, score);
+          queryIdToCorrectAnswerToScoreMap.put(queryID, correctAnswerToScoreMap);
+        }
+      }
+    }
+        
+    queryIDs = queryIdToQuestionBigramToWrongAnswerMap.keySet();
+    for (Integer queryID : queryIDs)
+    {
+      HashMap<Collection<String>, Collection<Collection<String>>> questionBigramsToWrongAnswerBigrams = 
+              queryIdToQuestionBigramToWrongAnswerMap.get(queryID);
+      Collection<Collection<String>> questionBigramCollections = 
+              questionBigramsToWrongAnswerBigrams.keySet();
+
+      for (Collection<String> questionBigrams : questionBigramCollections)
+      {
+        Collection<Collection<String>> wrongAnswerBigramCollections = 
+                questionBigramsToWrongAnswerBigrams.get(questionBigrams);
+        for (Collection<String> wrongAnswerBigrams : wrongAnswerBigramCollections)
+        {
+          HashSet<String> qBigrams = new HashSet<String>(questionBigrams);
+          HashSet<String> aBigrams = new HashSet<String>(wrongAnswerBigrams);
+          
+          aBigrams.retainAll(qBigrams);
+
+          double score = 2 * ((double)(aBigrams.size())/(questionBigrams.size() + 
+                  wrongAnswerBigrams.size()));
+          String answer = bigramtoTextMap.get(wrongAnswerBigrams);
+
+          HashMap<String, Double> wrongAnswerToScoreMap;
+          
+          if (queryIdToWrongAnswerToScoreMap.containsKey(queryID))
+          {
+            wrongAnswerToScoreMap = queryIdToWrongAnswerToScoreMap.get(queryID);
+          }
+          else
+          {
+            wrongAnswerToScoreMap = new HashMap<String, Double>();
+          }          
+          
+          wrongAnswerToScoreMap.put(answer, score);
+          queryIdToWrongAnswerToScoreMap.put(queryID, wrongAnswerToScoreMap);
+        }
+      }
+    }
+  }
+
+  /**
+   * Populates the QuestionBigramToCorrectAnswer and QuestionBigramToWrongAnswer maps.
+   * @param documentTexts Set of all documents
+   * @param queryIdToQuestionBigramToCorrectAnswerMap Map of query ID to Question Bigram to Correct
+   *          Answer.  
+   * @param queryIdToQuestionBigramToWrongAnswerMap Map of query ID to Question Bigram to Wrong
+   *          Answer.
+   */
+  private void populateQuestionBigramToAnswerMaps
+  (Set<String> documentTexts,
+  HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>> 
+    queryIdToQuestionBigramToCorrectAnswerMap,
+  HashMap<Integer, HashMap<Collection<String>, Collection<Collection<String>>>> 
+    queryIdToQuestionBigramToWrongAnswerMap) 
+  {
     for (String doc: documentTexts)
     {      
       Collection<String> bigrams = textToBigramMap.get(doc);
       if (sentenceToRelevanceMap.get(doc) == QUERY_TYPE)
       {
-        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
-                new HashMap<Collection<String>, Collection<String>>();
+        HashMap<Collection<String>, Collection<Collection<String>>> queryBigramsToCorrectAnswerBigramsMap = 
+                new HashMap<Collection<String>, Collection<Collection<String>>>();
+        HashMap<Collection<String>, Collection<Collection<String>>> queryBigramsToWrongAnswerBigramsMap = 
+                new HashMap<Collection<String>, Collection<Collection<String>>>();
                 
-        queryBigramsToAnswerBigramsMap.put(bigrams, new HashSet<String>());
+        queryBigramsToCorrectAnswerBigramsMap.put(bigrams, new HashSet<Collection<String>>());
+        queryBigramsToWrongAnswerBigramsMap.put(bigrams, new HashSet<Collection<String>>());
         
         queryIdToQuestionBigramToCorrectAnswerMap.put(sentenceToQueryIDMap.get(doc), 
-                queryBigramsToAnswerBigramsMap);
+                queryBigramsToCorrectAnswerBigramsMap);
         queryIdToQuestionBigramToWrongAnswerMap.put(sentenceToQueryIDMap.get(doc), 
-                queryBigramsToAnswerBigramsMap);
+                queryBigramsToWrongAnswerBigramsMap);
       }
     }
     
@@ -259,27 +426,49 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
 
       if (sentenceToRelevanceMap.get(doc) == INCORRECT_TYPE)
       {
-        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
+        HashMap<Collection<String>, Collection<Collection<String>>> queryBigramsToAnswerBigramsMap = 
                 queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc));
         Collection<Collection<String>> queryBigramList = 
                 queryBigramsToAnswerBigramsMap.keySet();
         for (Collection<String> queryBigrams : queryBigramList)
         {
-          System.out.println(bigrams);
-          queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc)).
-            put(queryBigrams, bigrams);
-          System.out.println(queryIdToQuestionBigramToWrongAnswerMap);
+          if (queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc)).
+                  containsKey(queryBigrams))
+          {
+            queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc))
+              .get(queryBigrams).add(bigrams);
+          }
+          else
+          {
+            HashSet<Collection<String>> bigramCollection = new HashSet<Collection<String>>();
+            bigramCollection.add(bigrams);
+            
+            queryIdToQuestionBigramToWrongAnswerMap.get(sentenceToQueryIDMap.get(doc))
+              .put(queryBigrams, bigramCollection);
+          }
         }        
       }
       else if (sentenceToRelevanceMap.get(doc) == CORRECT_TYPE)
       {
-        HashMap<Collection<String>, Collection<String>> queryBigramsToAnswerBigramsMap = 
+        HashMap<Collection<String>, Collection<Collection<String>>> queryBigramsToAnswerBigramsMap = 
                 queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc));
         Collection<Collection<String>> queryBigramList = queryBigramsToAnswerBigramsMap.keySet();
         for (Collection<String> queryBigrams : queryBigramList)
         {
-          queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc)).
-            put(queryBigrams, bigrams);
+          if (queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc)).
+                  containsKey(queryBigrams))
+          {
+            queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc))
+              .get(queryBigrams).add(bigrams);
+          }
+          else
+          {
+            HashSet<Collection<String>> bigramCollection = new HashSet<Collection<String>>();
+            bigramCollection.add(bigrams);
+            
+            queryIdToQuestionBigramToCorrectAnswerMap.get(sentenceToQueryIDMap.get(doc))
+              .put(queryBigrams, bigramCollection);
+          }       
         }        
       }
     }
