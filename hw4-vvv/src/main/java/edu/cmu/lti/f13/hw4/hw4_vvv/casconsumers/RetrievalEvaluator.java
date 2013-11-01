@@ -250,6 +250,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
     populateQuestionBigramToAnswerMaps(documentTexts, queryIdToQuestionBigramToCorrectAnswerMap,
             queryIdToQuestionBigramToWrongAnswerMap);
 
+    //System.out.println(queryIdToQuestionBigramToWrongAnswerMap);
+    
     HashMap<Integer, HashMap<String, Double>> queryIdToCorrectAnswerToScoreMap
         = new HashMap<Integer, HashMap<String, Double>>();
     HashMap<Integer, HashMap<String, Double>> queryIdToWrongAnswerToScoreMap
@@ -259,39 +261,66 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
                      queryIdToQuestionBigramToWrongAnswerMap, 
                      queryIdToCorrectAnswerToScoreMap,
                      queryIdToWrongAnswerToScoreMap);
-        
-    HashMap<Integer, HashMap<String, Double>> queryIdToCorrectAnswerToRankMap
-        = new HashMap<Integer, HashMap<String, Double>>();
+            
+    HashMap<Integer, HashMap<String, Integer>> queryIdToCorrectAnswerToRankMap
+        = new HashMap<Integer, HashMap<String, Integer>>();
     
     Set<Integer> queryIDs = queryIdToQuestionBigramToCorrectAnswerMap.keySet();
     
-    for (Integer queryID : queryIDs)
+    /*for (Integer queryID : queryIDs)
     {
-      HashMap<String, Double> correctAnswerToScoreMap = queryIdToCorrectAnswerToScoreMap.get(queryID);
-      HashMap<String, Double> wrongAnswerToScoreMap = queryIdToCorrectAnswerToScoreMap.get(queryID);
+      final HashMap<String, Double> correctAnswerToScoreMap = queryIdToCorrectAnswerToScoreMap.get(queryID);
+      final HashMap<String, Double> wrongAnswerToScoreMap = queryIdToWrongAnswerToScoreMap.get(queryID);
       
       Set<String> wrongAnswers = wrongAnswerToScoreMap.keySet();
-      Set<String> answers = correctAnswerToScoreMap.keySet();
+      Set<String> correctAnswers = correctAnswerToScoreMap.keySet();
+      
+      Set<String> answers = new HashSet<String>();
       answers.addAll(wrongAnswers);
+      answers.addAll(correctAnswers);
       
       List<String> answerList = new LinkedList<String>(answers);
       
-      Collections.sort(answerList, 
-              new Comparator<String>()
-              {
-                @Override
-                public int compare(String answer1, String answer2) 
-                {
-                  int score1;
-                  
-                  
-                  return 0;
-                }               
-              }
+      Collections.sort(answerList, new Comparator<String>()
+                                   {
+                                      @Override
+                                      public int compare(String answer1, String answer2) 
+                                      {
+                                        double score1, score2;
+                                        if (correctAnswerToScoreMap.containsKey(answer1))
+                                        {
+                                          score1 = correctAnswerToScoreMap.get(answer1);
+                                        }
+                                        else
+                                        {
+                                          score1 = wrongAnswerToScoreMap.get(answer1);
+                                        }
+                                        
+                                        if (correctAnswerToScoreMap.containsKey(answer2))
+                                        {
+                                          score2 = correctAnswerToScoreMap.get(answer2);
+                                        }
+                                        else
+                                        {
+                                          score2 = wrongAnswerToScoreMap.get(answer2);
+                                        }
+
+                                        return (int) ((score2 - score1) * 100);
+                                      }               
+                                   }
       );
-    }
+      
+      int rank = 1;
+      HashMap<String, Integer> correctAnswerToRankMap = new HashMap<String, Integer>();
+      for (String answer : answerList)
+      {
+        correctAnswerToRankMap.put(answer, rank++);
+      }
+      
+      queryIdToCorrectAnswerToRankMap.put(queryID, correctAnswerToRankMap);
+    }*/
               
-    System.out.println(queryIdToCorrectAnswerToScoreMap);
+    //System.out.println(queryIdToCorrectAnswerToRankMap);
   }
 
   /**
@@ -472,6 +501,10 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase
         }        
       }
     }
+    
+    System.out.println(textToBigramMap);
+    System.out.println(queryIdToQuestionBigramToCorrectAnswerMap);
+    System.out.println(queryIdToQuestionBigramToWrongAnswerMap);
   }
 	
 	/**
